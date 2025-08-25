@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Mock Interview</title>
+  <style>
+    video {
+      width: 45%;
+      border: 2px solid black;
+      margin: 5px;
+    }
+    #chat {
+      width: 90%;
+      height: 100px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+    input {
+      width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Mock Interview - WebRTC</h2>
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay></video>
+  
+  <br />
+  <button onclick="startCall()">Start Call</button>
+  <button onclick="hangup()">Hang Up</button>
+
+  <div id="chat"></div>
+  <input id="chatInput" placeholder="Type message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    const username = new URL(window.location.href).pathname.split("/").pop().replace(".html", "");
+    const socket = new WebSocket(`ws://${location.host}/webrtc/${username}`);
+
+    let pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+    let localStream;
+
+    const localVideo = document.getElementById("localVideo");
+    const remoteVideo = document.getElementById("remoteVideo");
+    const chatBox = document.getElementById("chat");
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+      localVideo.srcObject = stream;
+      localStream = stream;
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    });
+
+    pc.onicecandidate = event => {
+      if (event.candidate) {
+        socket.send(JSON.stringify({
+          type: "_ice",
+          toUser: prompt("Enter Interviewer's Username:"),
+          fromUser: username,
+          iceCandidate: event.candidate
+        }));
+      }
+    };
+
+    pc.ontrack = event => {
+      remoteVideo.srcObject = event.streams[0];
+    };
+
+    socket.onmessage = async (msg) => {
+      const data = JSON.parse(msg.data);
+      if (data.type === "offer") {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.send(JSON.stringify({
+          type: "answer",
+          toUser: data.fromUser,
+          fromUser: username,
+          sdp: answer
+        }));
+      } else if (data.type === "answer") {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+      } else if (data.type === "_ice") {
+        await pc.addIceCandidate(new RTCIceCandidate(data.iceCandidate));
+      } else if (data.type === "chat") {
+        chatBox.innerHTML += `<p><strong>${data.fromUser}:</strong> ${data.msg}</p>`;
+      }
+    };
+
+    function startCall() {
+      pc.createOffer().then(offer => {
+        pc.setLocalDescription(offer);
+        socket.send(JSON.stringify({
+          type: "offer",
+          toUser: prompt("Enter Interviewer's Username:"),
+          fromUser: username,
+          sdp: offer
+        }));
+      });
+    }
+
+    function hangup() {
+      pc.close();
+      pc = null;
+      socket.send(JSON.stringify({ type: "hangup", fromUser: username }));
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("chatInput");
+      const message = input.value;
+      input.value = "";
+      chatBox.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+      socket.send(JSON.stringify({
+        type: "chat",
+        msg: message,
+        toUser: prompt("Enter Interviewer's Username:"),
+        fromUser: username
+      }));
+    }
+  </script>
+</body>
+</html>

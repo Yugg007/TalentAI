@@ -1,0 +1,160 @@
+/* Container */
+.ats-container {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f9f9f9, #eef2f7);
+  overflow-y: auto;
+}
+
+/* Card */
+.ats-card {
+  background: #fff;
+  padding: 30px 25px;
+  border-radius: 14px;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 720px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.ats-title {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 28px;
+  color: #007bff;
+  font-weight: 600;
+}
+
+/* Form sections */
+.form-section {
+  margin-bottom: 22px;
+}
+
+.section-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #222;
+}
+
+/* File + text inputs */
+.file-input,
+.text-input,
+.prompt-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.text-input:focus,
+.file-input:focus,
+.prompt-textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.35);
+  outline: none;
+}
+
+/* Keywords */
+.keyword-input-box {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.add-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.add-button:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.keyword-tag {
+  background: #007bff;
+  color: white;
+  padding: 7px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.keyword-tag button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Prompt */
+.prompt-textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.prompt-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #555;
+  font-style: italic;
+}
+
+/* Submit button */
+.submit-button {
+  margin-top: 22px;
+  width: 100%;
+  background: linear-gradient(135deg, #28a745, #43c06d);
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.submit-button:hover {
+  background: linear-gradient(135deg, #218838, #34ad5a);
+  transform: translateY(-2px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

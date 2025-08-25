@@ -1,0 +1,51 @@
+📄 Job Title: Software Engineer (Level 2)
+Location: Bangalore / Hyderabad / Gurgaon, India
+Company: Google
+Job Type: Full-Time
+Experience Level: 1–3 Years
+
+🧠 About the Role:
+Google is looking for talented Software Engineers with 2 years of professional experience who are passionate about building performant, scalable, and user-friendly systems that make an impact at a global scale. You will contribute to real-world products, solve complex technical challenges, and work alongside world-class engineers.
+
+🎯 Key Responsibilities:
+- Write clean, maintainable, and efficient code in Java, Python, Go, or C++.
+- Participate in the design, development, testing, deployment, and maintenance of software solutions.
+- Collaborate with cross-functional teams to deliver high-quality features and improvements.
+- Contribute to technical documentation, code reviews, and debugging.
+- Work on optimizing backend APIs and systems for performance and scalability.
+- Participate in sprint planning, architectural discussions, and daily standups.
+
+💼 Minimum Qualifications:
+- Bachelor’s degree in Computer Science, Engineering, or equivalent practical experience.
+- 1–3 years of experience in software development.
+- Proficiency in at least one programming language: Java, Python, Go, or C++.
+- Solid understanding of computer science fundamentals: data structures, algorithms, object-oriented design, system design.
+- Experience with Git, REST APIs, and basic software development workflows.
+- Exposure to web or backend development.
+
+✅ Preferred Qualifications:
+- Experience with distributed systems or microservices architecture.
+- Familiarity with cloud platforms such as GCP, AWS, or Azure.
+- Exposure to containerization tools like Docker or Kubernetes.
+- Good understanding of SQL/NoSQL databases.
+- Internship or open-source contributions.
+- Strong problem-solving and analytical thinking skills.
+- Ability to work collaboratively in a team environment.
+
+🛠️ Tech Stack:
+- Languages: Java, Python, Go, C++
+- Cloud: GCP (preferred), AWS
+- Frameworks/Tools: Git, Docker, Kubernetes, REST, gRPC
+- Databases: MySQL, Spanner, Firestore, Redis
+
+🎁 Why Join Google?
+- Be a part of meaningful, large-scale impact projects.
+- Work with world-class engineers and mentors.
+- Flexible, collaborative, and innovation-focused work culture.
+- Competitive compensation, health insurance, equity, and learning perks.
+
+📩 How to Apply:
+Visit careers.google.com and apply with your updated resume, highlighting:
+- Projects that show impact and ownership
+- Real-world systems you built or contributed to
+- Problem-solving depth and technology ownership

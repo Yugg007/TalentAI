@@ -1,0 +1,176 @@
+/* 🔹 Reset Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* 🔹 Navbar - Fixed at the Top */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+  }
+  
+  /* 🔹 Left Section - Logo */
+  .navbar-left {
+    flex: 1;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  
+  /* 🔹 Right Section - Links & Profile */
+  .navbar-right {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+  }
+  
+  /* 🔹 Center Navigation Links */
+  .nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+  
+  .nav-links a:hover {
+    color: #007bff;
+  }
+  
+  /* 🔹 Profile Menu */
+  .profile-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* 🔹 Profile Icon */
+  .profile-icon {
+    font-size: 1.8rem;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  .profile-icon:hover {
+    color: #007bff;
+  }
+  
+  /* 🔹 Dropdown Menu */
+  .dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .dropdown-menu a, .dropdown-menu .logout {
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.3s;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .dropdown-menu a:hover, .dropdown-menu .logout:hover {
+    background: #f0f0f0;
+  }
+  
+  .logout {
+    color: red !important;
+  }
+  
+  /* 🔹 Logout Confirmation Modal */
+  .logout-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  
+  .modal-content p {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+  }
+  
+  .modal-content .yes, .modal-content .no {
+    padding: 8px 15px;
+    border: none;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+  }
+  
+  .modal-content .yes {
+    background: #007bff;
+    color: white;
+  }
+  
+  .modal-content .no {
+    background: #ddd;
+  }
+
+  .login-icon {
+    font-size: 1.5rem;
+    color: #333;
+    text-decoration: none;
+    margin-left: 20px;
+    transition: color 0.3s;
+  }
+  
+  .login-icon:hover {
+    color: #007bff;
+  }
+  
+  

@@ -1,0 +1,24 @@
+/* Ensure full height for root containers */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scroll on body */
+  font-family: Arial, sans-serif;
+}
+
+/* App container is full height */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Space below navbar */
+.main-content {
+  flex: 1;
+  overflow-y: auto; /* Scroll only this area if needed */
+  padding-top: 60px; /* Navbar height */
+  background-color: #f9f9f9;
+  height: calc(100vh - 60px); /* Fill remaining height */
+}

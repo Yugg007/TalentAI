@@ -1,0 +1,69 @@
+# Global ignores
+.DS_Store
+Thumbs.db
+*.log
+*.env
+*.bak
+*.tmp
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# React & Node.js (frontend and backend)
+**/node_modules/
+**/build/
+**/dist/
+**/.next/
+**/.turbo/
+**/.cache/
+
+# Spring Boot (Java)
+**/target/
+**/*.class
+**/*.jar
+**/*.war
+**/*.iml
+**/.mvn/
+**/.settings/
+**/.classpath
+**/.project
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.mypy_cache/
+**/.venv/
+**/venv/
+**/env/
+**/.ipynb_checkpoints/
+
+# Logs
+**/logs/
+**/*.log
+
+# OS files
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Coverage and testing
+**/coverage/
+**/.coverage
+**/htmlcov/
+**/test-results/
+/.metadata/
+
+
+
+Others/
+.metadata/
+React-webRTC/
+resume-matcher-ai/
+TempWebRTC/
+docker-compose.yml
+Port Configuration.xlsx
+

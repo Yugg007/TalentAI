@@ -1,0 +1,66 @@
+# Universal ignores
+.git
+.gitignore
+Dockerfile*
+docker-compose*
+README.md
+LICENSE
+*.md
+*.log
+*.bak
+*.tmp
+*.swp
+*.swo
+.vscode
+.idea
+.env
+.env.*
+
+
+# React / Node.js
+node_modules
+dist
+build
+.npm
+.cache
+.next
+out
+coverage
+
+# Spring Boot / Java
+# target
+*.class
+*.war
+*.iml
+.mvn
+.settings
+.project
+.classpath
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+env
+venv
+.pytest_cache
+.mypy_cache
+.ipynb_checkpoints
+
+# OS/system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+Icon?
+
+# Test/coverage folders (all languages)
+coverage
+test-results
+reports
+
+
+node_modules
+npm-debug.log

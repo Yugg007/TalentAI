@@ -1,0 +1,247 @@
+/* Global Reset & Force Left Alignment */
+html, body, #root {
+  margin: 0;
+  text-align: left !important;
+  font-family: Arial, sans-serif;
+  width: 100%;
+  background-color: #f9f9f9;
+}
+
+/* Container */
+.page-container {
+  padding: 32px;
+  /* max-width: 1200px; */
+  margin: 0 auto;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color:black
+}
+
+/* My Connections */
+.my-connections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.connection-card {
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-pic {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.profile-pic.blue { background-color: #4f8ef7; }
+.profile-pic.yellow { background-color: #f4c542; }
+.profile-pic.purple { background-color: #a05adf; }
+
+.profile-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons button {
+  padding: 6px 12px;
+  border: none;
+  background-color: #2f80ed;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.action-buttons button:hover {
+  background-color: #1366d6;
+}
+
+/* Pending Connections */
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.pending-card {
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.invite-again {
+  padding: 6px 10px;
+  background-color: #B0BEC5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.accept-invite{
+    padding: 6px 10px;
+  background-color: #ff5c5c;;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.accept-invite:hover {
+  background-color: #e14545;
+}
+
+/* People Grid - Three per row */
+.people-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.people-card {
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.person-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.education {
+  font-size: 14px;
+  color: #666;
+}
+
+.description p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+/* People Grid - Force 3 per row */
+.people-grid-fixed {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.people-card {
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  height: 100%;
+}
+
+
+.invite-button {
+  margin-top: 10px;
+  padding: 6px 10px;
+  background-color: #2f80ed;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.invite-button:hover {
+  background-color: #1366d6;
+}
+
+.invite-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.invite-form input {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.invite-form button {
+  padding: 6px 10px;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.invite-form button:hover {
+  background-color: #219150;
+}
+
+/* Fix typo */
+.person-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* Improve general responsiveness */
+@media (max-width: 768px) {
+  .people-grid-fixed {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .people-grid-fixed {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .people-grid-fixed {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Consistent section spacing */
+section {
+  margin-bottom: 40px;
+}
+
+/* Ensure form input full width on mobile */
+.invite-form input {
+  min-width: 0;
+}
+
