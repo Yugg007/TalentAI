@@ -24,13 +24,8 @@ public class SpringSecurity {
     SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource)) // ✅ inject and use CORS config
-                .csrf(csrf -> csrf.disable());
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()         // For CORS preflight
-////                        .requestMatchers("/user/login", "/user/logout").permitAll() 
-//                        .anyRequest().authenticated()                                  // All others require login
-//                    )
-//                    .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
                 return http.build();
             }
@@ -39,10 +34,16 @@ public class SpringSecurity {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://talent-ai-frontend.s3-website.ap-south-1.amazonaws.com", "http://localhost:9001"));
+        // Allow your React frontend
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:9001")); 
+
+        // Allow methods
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*")); // or list explicitly
-        configuration.setExposedHeaders(List.of("Authorization"));
+
+        // Allow headers
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+
+        // Allow credentials (cookies, tokens, etc.)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

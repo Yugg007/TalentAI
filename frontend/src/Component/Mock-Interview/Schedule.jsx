@@ -6,7 +6,7 @@ import MultiSelect from '../Utility/MultiSelect/MultiSelect';
 import Storage from '../../Utils/Storage';
 import Loader from '../Utility/Loader';
 
-const Schedule = () => {
+const Schedule = ({ handleGoogleAuth, checkGoogleToken }) => {
     const [activeTab, setActiveTab] = useState('upcoming');
     const [meetingTitle, setMeetingTitle] = useState("");
     const [meetingDate, setMeetingDate] = useState("");
@@ -25,9 +25,7 @@ const Schedule = () => {
         if (response?.data) {
             setMyConnections(response.data.myConnections || []);
         }
-
     }
-
 
     const fetchUpcomingMeetings = async () => {
         setLoader(true);
@@ -89,15 +87,35 @@ const Schedule = () => {
         setLoader(false);
     };
 
-    useEffect(() => {
-        fetchUpcomingMeetings();
-    }, []);
+    const setActiveTabToSchedule = async () => {
+        setLoader(true);
+        const isAuthorized = await checkGoogleToken();
+        if (isAuthorized) {
+            setLoader(false);
+            fetchUsers();
+            setActiveTab('schedule');
+        } else {
+            handleGoogleAuth();
+        }
+    }
+
+    const handleMessage = (event) => {
+        if (event.data.GauthResponse == "success") {
+            setActiveTabToSchedule();
+            console.log("OAuth successful ✅");
+        } else {
+            console.log("OAuth failed ❌");
+            setLoader(false);
+        }
+    };
 
     useEffect(() => {
-        if (activeTab === 'schedule') {
-            fetchUsers();
-        }
-    }, [activeTab]);
+        fetchUpcomingMeetings();
+
+        window.addEventListener("message", handleMessage);
+
+        return () => window.removeEventListener("message", handleMessage);
+    }, []);
 
     return (
         <div>
@@ -111,7 +129,7 @@ const Schedule = () => {
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('schedule')}
+                    onClick={setActiveTabToSchedule}
                 >
                     Schedule Interview
                 </button>
@@ -186,12 +204,16 @@ const Schedule = () => {
                                                         Join
                                                     </a>
                                                 )}
-                                                <button
-                                                    className="delete-btn"
-                                                    onClick={() => handleDeleteMeeting(meeting?.eventId)}
-                                                >
-                                                    Delete
-                                                </button>
+                                                {
+                                                    (meeting.admin === Storage.getStorageData('username'))
+                                                    &&
+                                                    <button
+                                                        className="delete-btn"
+                                                        onClick={() => handleDeleteMeeting(meeting?.eventId)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                }
                                             </div>
                                         </div>
                                         <p className="meeting-datetime">

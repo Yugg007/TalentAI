@@ -58,7 +58,7 @@ public class MeetingService {
 	}
 
 	public List<MeetingDetail> fetchAll(String username) {
-		return meetingRepository.findByAdmin(username);
+		return meetingRepository.findByAdminOrJoineeContaining(username, username);
 	}
 
 	public String createMeeting(String username, String accessToken, Map<Object, Object> mp) throws GeneralSecurityException, IOException {

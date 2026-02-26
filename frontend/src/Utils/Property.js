@@ -1,5 +1,5 @@
 const Property = {
-    SpringBackendPath : "https://localhost:9002/TalentAI",
+    SpringBackendPath : "http://localhost:9002/TalentAI",
     NodeBackendPath : "http://localhost:9004",
 }
 

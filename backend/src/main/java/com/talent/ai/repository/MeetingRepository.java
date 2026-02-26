@@ -9,6 +9,8 @@ import com.talent.ai.model.MeetingDetail;
 public interface MeetingRepository extends JpaRepository<MeetingDetail, Long>{
 
 	List<MeetingDetail> findByAdmin(String username);
+	
+	List<MeetingDetail> findByAdminOrJoineeContaining(String admin, String joineePart);
 
 	MeetingDetail findByEventId(String eventId);
 

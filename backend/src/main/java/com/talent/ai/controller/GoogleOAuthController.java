@@ -99,16 +99,38 @@ public class GoogleOAuthController {
         String email = jsonObj.getString("email");      
 
         String token = AesUtil.decrypt(cookieUtil.extractTokenFromCookies(req));
+        String res = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head><title>Google Auth</title></head>\n" +
+                "<body>\n" +
+                "  <p>Please choose correct google account.</p>\n" +
+                "  <script>\n" +
+                "    setTimeout(function() {\n" +
+                "      window.opener.postMessage(\n" +
+                "        { GauthResponse: 'failed' },\n" +
+                "        'http://localhost:9001'\n" +
+                "      );\n" +
+                "      window.close();\n" +
+                "    }, 5000);\n" +
+                "  </script>\n" +
+                "</body>\n" +
+                "</html>";
+
 
         if (email.equalsIgnoreCase(state)) {
             String newToken = jwtUtil.addClaim(token, "googleAccessToken", accessToken);
             String cookieValue = "talentAiToken=" + AesUtil.encrypt(newToken) +
                     "; Max-Age=36000; Path=/; HttpOnly; SameSite=None; Secure";
             headers.add(HttpHeaders.SET_COOKIE, cookieValue);
-            return ResponseEntity.ok().headers(headers).body("<script>window.close();</script>");
-        } else {
-            throw new Exception("Username mismatch.");
+            res = "<script>\n" +
+                    "  window.opener.postMessage(\n" +
+                    "    { GauthResponse : 'success' },\n" +
+                    "    'http://localhost:9001'\n" +
+                    "  );\n" +
+                    "  window.close();\n" +
+                    "</script>";
         }
+        return ResponseEntity.ok().headers(headers).body(res);
     }
 
     @PostMapping("/check-token")
