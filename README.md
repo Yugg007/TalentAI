@@ -14,12 +14,20 @@
 |                      |        |                      |        
 +---|------------------+        +----------------------+        +-----------------------+
       |                          |
-      | Socket.io / REST         |                   +-----------------
-      v                          v                   | MongoDB         |
-+----------------------+        +----------------+   | (chats & cache) |
-| Node Communication   | <----> | Google Calendar |   +-----------------
+      | Socket.io / REST         |
+      v                          v  (External services)
++----------------------+        +----------------+
+| Node Communication   | <----> | Google Calendar |
 | Service (port 9004)  |        | / Cohere AI     |
 +----------------------+        +----------------+
+      ^
+      |
+      |
+      v
++----------------+
+|    MongoDB      |
+| (chats & cache) |
++----------------+
 ```
 
 Each service runs independently and can be containerised using the provided Dockerfiles.
@@ -65,7 +73,7 @@ Optionally, install `docker` and `docker-compose` if you plan to run services in
   # application.properties (example)
   spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/talentai}
   spring.datasource.username=${DB_USER:root}
-  spring.datasource.password=${DB_PASS:root123}
+  spring.datasource.password=${DB_PASS:password}
 
   google.client.id=${GOOGLE_CLIENT_ID:}
   google.client.secret=${GOOGLE_CLIENT_SECRET:}
@@ -89,7 +97,7 @@ Create `backend/.env` (optional) with:
 ```ini
 DB_URL=jdbc:mysql://localhost:3306/talentai
 DB_USER=root
-DB_PASS=root123
+DB_PASS=<your sql db password>
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_REDIRECT_URI=https://localhost:9002/TalentAI/api/google/oauth2callback
@@ -208,4 +216,4 @@ By following this document and populating the required environment variables, yo
 3. Replace hard‑coded secrets with environment‑driven configuration.
 4. Deploy the system on a different server or container platform with minimal friction.
 
-Enjoy exploring and extending **TalentAI**! 🚀
+Enjoy exploring and extending **TalentAI**!
