@@ -20,12 +20,8 @@ function JobDetail({ jobId }) {
   const [jobFetchFailed, setJobFetchFailed] = useState(false);
 
   const skills = job?.skills?.split(',').map((skill) => skill.trim()).filter(Boolean) || [];
-  const aiFitScore = job?.matchScore || Math.max(72, 96 - (skills.length * 2));
-  const strengths = [
-    'Fast-growing hiring pipeline',
-    'Competitive compensation range',
-    'Collaborative product and engineering team',
-  ];
+  const hasMatchScore = job?.matchScore !== undefined && job?.matchScore !== null && job?.matchScore !== '';
+  const matchScore = Number(job?.matchScore);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -95,7 +91,7 @@ function JobDetail({ jobId }) {
               <div className="job-card-header">
                 <img src={demoImage} alt="Company Logo" className="job-logo" />
                 <div className="job-header-copy">
-                  <span className="job-badge-pill">AI Match</span>
+                  <span className="job-badge-pill">Role brief</span>
                   <h1 className="job-title">{job?.title}</h1>
                   <p className="company-name">{job?.company}</p>
                   <div className="job-meta-chips">
@@ -107,9 +103,15 @@ function JobDetail({ jobId }) {
               </div>
 
               <div className="job-score-card">
-                <div className="score-label">Predicted fit</div>
-                <div className="score-value">{aiFitScore}%</div>
-                <p className="score-copy">AI estimates how well your resume matches this role based on skills and experience.</p>
+                <div className="score-label">{hasMatchScore ? 'Resume fit' : 'Your next step'}</div>
+                <div className={`score-value${hasMatchScore ? '' : ' is-pending'}`}>
+                  {hasMatchScore && Number.isFinite(matchScore) ? `${Math.round(matchScore)}%` : 'Not assessed'}
+                </div>
+                <p className="score-copy">
+                  {hasMatchScore
+                    ? 'This is the match score currently available for this role.'
+                    : 'Upload your resume below to compare your experience with this role.'}
+                </p>
               </div>
 
               <div className="job-info-card">
@@ -123,11 +125,11 @@ function JobDetail({ jobId }) {
               </div>
 
               <div className="reason-list">
-                <h2>Why this role matters</h2>
+                <h2>Before you apply</h2>
                 <ul>
-                  {strengths.map((reason, index) => (
-                    <li key={index}>{reason}</li>
-                  ))}
+                  <li>Review the required skills against your recent work.</li>
+                  <li>Use the resume report to find gaps worth addressing.</li>
+                  <li>Tailor your application to this role’s description.</li>
                 </ul>
               </div>
             </section>

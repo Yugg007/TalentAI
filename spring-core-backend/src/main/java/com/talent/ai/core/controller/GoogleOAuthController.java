@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,9 @@ public class GoogleOAuthController {
     private MasterData masterData;
 
     private final GoogleConfig config;
+
+        @Value("${frontend.origin:http://localhost:7000}")
+        private String frontendOrigin;
 
     public GoogleOAuthController(GoogleConfig config) {
         this.config = config;
@@ -108,7 +112,7 @@ public class GoogleOAuthController {
                 "    setTimeout(function() {\n" +
                 "      window.opener.postMessage(\n" +
                 "        { GauthResponse: 'failed' },\n" +
-                "        'http://localhost:9001'\n" +
+                "        '" + frontendOrigin + "'\n" +
                 "      );\n" +
                 "      window.close();\n" +
                 "    }, 5000);\n" +
@@ -125,7 +129,7 @@ public class GoogleOAuthController {
             res = "<script>\n" +
                     "  window.opener.postMessage(\n" +
                     "    { GauthResponse : 'success' },\n" +
-                    "    'http://localhost:9001'\n" +
+                    "    '" + frontendOrigin + "'\n" +
                     "  );\n" +
                     "  window.close();\n" +
                     "</script>";

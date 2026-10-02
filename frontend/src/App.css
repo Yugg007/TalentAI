@@ -1,32 +1,651 @@
-/* Ensure full height for root containers */
-html, body, #root {
-  min-height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f4f7fb;
-}
-
-* {
-  box-sizing: border-box;
+#root {
+  min-height: 100vh;
 }
 
 body {
   overflow-x: hidden;
+  background:
+    linear-gradient(rgba(243, 245, 241, 0.72), rgba(243, 245, 241, 0.72)),
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(40, 70, 54, 0.025) 39px 40px),
+    var(--canvas);
 }
 
-/* App container is full height */
 .app-container {
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
-  background-color: #f4f7fb;
 }
 
-/* Space below navbar */
 .main-content {
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 70px;
-  background-color: #f4f7fb;
+  min-height: 100vh;
+  margin-left: 252px;
+  padding: 104px clamp(24px, 4vw, 64px) 56px;
+}
+
+.main-content > * {
+  width: min(100%, 1440px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.Toastify__toast {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: 'DM Sans', 'Avenir Next', sans-serif;
+}
+
+@media (max-width: 760px) {
+  .main-content {
+    min-height: calc(100vh - 72px);
+    margin-left: 0;
+    padding: 92px 18px 100px;
+  }
+}
+
+:is(.ats-container, .job-detail-container, .job-create-container, .page-container, .articles-container, .profile-container) {
+  width: min(100%, 1440px);
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.auth-wrapper,
+.profile-wrapper {
+  min-height: 0;
+  padding: 16px 0;
+  background: transparent;
+}
+
+.auth-wrapper {
+  display: grid;
+  width: min(100%, 1060px);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+  align-items: center;
+  gap: clamp(32px, 7vw, 92px);
+  margin: 0 auto;
+}
+
+.auth-story {
+  max-width: 520px;
+  padding: 14px 0;
+}
+
+.auth-story-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 19px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.auth-story-kicker span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.auth-story h1 {
+  max-width: 470px;
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.12;
+}
+
+.auth-story h1 em {
+  color: var(--forest);
+  font-style: normal;
+}
+
+.auth-story > p:not(.auth-story-kicker) {
+  max-width: 420px;
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.auth-story-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 27px;
+}
+
+.auth-story-steps span {
+  display: inline-flex;
+  min-height: 29px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.auth-story-steps b {
+  color: var(--forest);
+  font-size: 9px;
+}
+
+.auth-card {
+  max-width: 430px;
+  padding: 31px;
+  text-align: left;
+}
+
+.auth-card h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 21px;
+  text-align: left;
+}
+
+.auth-intro {
+  margin: 7px 0 22px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.auth-form {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-card .input-group {
+  min-height: 46px;
+  gap: 10px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.auth-card .input-group .icon {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.auth-card .input-group input {
+  min-width: 0;
+  min-height: 42px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 12px;
+}
+
+.auth-card .role-selector {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-card .role-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.auth-card .radio-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.auth-card .role-option {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.auth-card .role-option.active {
+  border-color: var(--forest);
+  background: #f0f4ec;
+  color: var(--forest);
+}
+
+.auth-card .btn-primary {
+  min-height: 45px;
+  margin-top: 3px;
+  padding: 0 14px;
+  border: 0;
+  font-size: 12px;
+}
+
+.toggle-text {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: left;
+}
+
+.auth-toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--forest);
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 700;
+}
+
+.score-value.is-pending {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+:is(.auth-card, .ats-card, .job-create-container, .profile-container, .job-card-panel, .job-sidebar-panel, .mock-form, .connection-card, .pending-card, .people-card, .articles-container .card, .profile-card, .profile-field) {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+:is(.auth-card, .ats-card, .job-create-container, .profile-container, .job-card-panel, .job-sidebar-panel, .mock-form, .connection-card, .pending-card, .people-card, .articles-container .card, .profile-card, .profile-field) {
+  background: var(--paper);
+}
+
+:is(input, textarea, select) {
+  border-color: var(--line-strong);
+  border-radius: 6px;
+  background-color: #fff;
+  color: var(--ink);
+  font-family: inherit;
+}
+
+:is(.btn-primary, .submit-button, .apply-btn, .submit-btn, .schedule-btn, .action-buttons button, .invite-button, .accept-invite, .chat-input-container button, .chat-input button) {
+  border: 1px solid var(--forest);
+  border-radius: 6px;
+  background: var(--forest);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+}
+
+:is(.btn-primary, .submit-button, .apply-btn, .submit-btn, .schedule-btn, .action-buttons button, .invite-button, .accept-invite, .chat-input-container button, .chat-input button):hover:not(:disabled) {
+  background: var(--forest-deep);
+  color: #fff;
+}
+
+.ats-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.ats-card {
+  max-width: 940px;
+  padding: clamp(22px, 4vw, 42px);
+}
+
+.ats-title,
+.mock-title,
+.section-title,
+.section-heading,
+.job-create-title,
+.profile-title {
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  text-align: left;
+}
+
+.ats-title,
+.mock-title,
+.section-heading {
+  font-size: 28px;
+}
+
+.section-title {
+  margin-bottom: 16px;
+  font-size: 21px;
+}
+
+.job-detail-container {
+  margin-top: 0;
+}
+
+.job-detail-grid {
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
+  gap: 16px;
+}
+
+.job-card-panel,
+.job-sidebar-panel {
+  padding: clamp(18px, 3vw, 30px);
+}
+
+.job-title {
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 31px;
+  line-height: 1.18;
+}
+
+.job-badge-pill,
+.job-meta-chips span,
+.skill-chip {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #f4f6f1;
+  color: var(--forest);
+}
+
+.job-score-card {
+  border: 1px solid #d9e5ce;
+  border-radius: 8px;
+  background: #f1f5eb;
+}
+
+.score-label,
+.score-value {
+  color: var(--forest);
+}
+
+.apply-btn.secondary {
+  border-color: var(--line-strong);
+  background: #fff;
+  color: var(--forest);
+}
+
+.job-create-container {
+  max-width: 900px;
+  padding: clamp(20px, 4vw, 38px);
+}
+
+.job-create-title {
+  margin: 0 0 24px;
+  font-size: 25px;
+}
+
+.job-create-form {
+  max-width: 100%;
+}
+
+.job-create-form :is(input, textarea) {
+  min-height: 42px;
+  padding: 10px 12px;
+}
+
+.job-create-form textarea {
+  min-height: 130px;
+}
+
+.profile-container {
+  max-width: 900px;
+  padding: clamp(20px, 4vw, 36px);
+}
+
+.profile-title {
+  margin: 0 0 24px;
+  font-size: 25px;
+}
+
+.profile-field {
+  background: #f8f9f6;
+}
+
+.profile-container .profile-monogram {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--lime);
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.articles-container {
+  padding: 0;
+}
+
+.articles-container .section-heading {
+  margin: 0 0 32px;
+}
+
+.articles-container .section {
+  margin-bottom: 34px;
+}
+
+.articles-container .section h2 {
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+}
+
+.articles-container .card-grid {
+  gap: 12px;
+}
+
+.articles-container .card {
+  padding: 19px;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.articles-container .card:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+}
+
+.articles-container .card a {
+  color: var(--forest);
+}
+
+.chatbot-container {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: min(740px, calc(100vh - 155px));
+  min-height: 470px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow-soft);
+  font-family: inherit;
+}
+
+.chatbot-container .chat-header {
+  padding: 17px 21px;
+  background: var(--forest);
+  font-size: 15px;
+  text-align: left;
+}
+
+.chatbot-container .chat-window {
+  padding: 24px;
+  background: #f6f8f4;
+}
+
+.chatbot-container .message-text {
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.chatbot-container .user .message-text {
+  border-bottom-right-radius: 3px;
+  background: var(--forest);
+}
+
+.chatbot-container .bot .message-text {
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 3px;
+}
+
+.chatbot-container .chat-input {
+  gap: 10px;
+  padding: 12px 16px;
+  border-top-color: var(--line);
+}
+
+.chatbot-container .chat-input input {
+  min-height: 42px;
+  border-radius: 6px;
+}
+
+.chatbot-container .chat-input button {
+  margin: 0;
+  border-radius: 6px;
+}
+
+.chatroom-container {
+  height: min(760px, calc(100vh - 155px));
+  min-height: 480px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  font-family: inherit;
+}
+
+.chatroom-container .sidebar {
+  width: 280px;
+  flex: 0 0 280px;
+  border-right-color: var(--line);
+  background: #f8f9f6;
+}
+
+.chatroom-container .sidebar-title {
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 17px;
+  text-align: left;
+}
+
+.chatroom-container .chat-area {
+  min-width: 0;
+}
+
+.chatroom-container .chat-header {
+  min-height: 58px;
+  background: var(--forest);
+  font-size: 14px;
+}
+
+.chatroom-container .chat-messages {
+  background: #f6f8f4;
+}
+
+.chatroom-container .message {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.chatroom-container .message.sent {
+  border-color: #d4e4c8;
+  background: #e8f1df;
+}
+
+.chatroom-container .chat-input-container {
+  gap: 9px;
+  border-top-color: var(--line);
+}
+
+.chatroom-container .chat-input-container input {
+  min-width: 0;
+  border-radius: 6px;
+}
+
+.profile-card {
+  max-width: 920px;
+  background: var(--paper);
+}
+
+.profile-heading h2,
+.profile-section-block h3,
+.edit-profile-header h3 {
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+}
+
+@media (max-width: 760px) {
+  .auth-wrapper {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .auth-story {
+    padding: 0;
+  }
+
+  .auth-story h1 {
+    font-size: 31px;
+  }
+
+  .auth-story > p:not(.auth-story-kicker) {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .auth-story-steps {
+    margin-top: 14px;
+  }
+
+  .auth-card {
+    width: 100%;
+    padding: 22px;
+  }
+
+  .job-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .job-card-header {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .job-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .job-title {
+    font-size: 25px;
+  }
+
+  .chatroom-container {
+    height: calc(100dvh - 190px);
+    min-height: 420px;
+  }
+
+  .chatroom-container .sidebar {
+    width: 118px;
+    flex-basis: 118px;
+    padding: 12px 8px;
+  }
+
+  .chatbot-container {
+    height: calc(100dvh - 190px);
+    min-height: 420px;
+  }
 }

@@ -39,7 +39,7 @@ const UserProfile = () => {
     return <p className="no-data">Loading user data...</p>;
   }
 
-  const imageUrl = "https://picsum.photos/300/200";
+  const profileInitial = (user?.firstName || user?.username || "T").charAt(0).toUpperCase();
 
   return (
     <>
@@ -48,11 +48,9 @@ const UserProfile = () => {
       ) : (
         <div className="profile-container">
           <h2 className="profile-title">User Profile</h2>
-          <img
-            className="centered-image"
-            src={imageUrl}
-            alt="Random from Unsplash"
-          />
+          <div className="centered-image profile-monogram" aria-hidden="true">
+            {profileInitial}
+          </div>
 
           <div className="profile-grid">
             <div className="profile-field">

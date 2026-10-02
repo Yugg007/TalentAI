@@ -1,31 +1,94 @@
-import React, { useEffect, useState } from 'react';
+import { createElement, useEffect, useState } from 'react';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BriefcaseBusiness,
+  CalendarDays,
+  FileText,
+  MapPin,
+  Search,
+  Sparkles,
+  UsersRound,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './style.css';
-import { Link, useNavigate } from 'react-router-dom';
-import demoImage from '../../assets/google.png';
 import { BackendService } from '../../Utils/Api\'s/ApiMiddleWare';
 import ApiEndpoints from '../../Utils/Api\'s/ApiEndpoints';
 import { useAuth } from '../../context/AuthContext';
 
+const candidateActions = [
+  {
+    icon: BriefcaseBusiness,
+    number: '01',
+    title: 'Explore the market',
+    text: 'Find roles that fit the work you want to do next.',
+    to: '/job',
+    tone: 'mint',
+  },
+  {
+    icon: FileText,
+    number: '02',
+    title: 'Check your fit',
+    text: 'Compare your resume with a role before applying.',
+    to: '/ats-score',
+    tone: 'butter',
+  },
+  {
+    icon: CalendarDays,
+    number: '03',
+    title: 'Prepare to meet',
+    text: 'Practice and schedule your next interview.',
+    to: '/mock-interview',
+    tone: 'rose',
+  },
+];
+
+const recruiterActions = [
+  {
+    icon: BriefcaseBusiness,
+    number: '01',
+    title: 'Open a role',
+    text: 'Publish a clear brief for the people you need.',
+    to: '/job',
+    tone: 'mint',
+  },
+  {
+    icon: UsersRound,
+    number: '02',
+    title: 'Build your network',
+    text: 'Find and connect with people in your pipeline.',
+    to: '/connection',
+    tone: 'butter',
+  },
+  {
+    icon: Sparkles,
+    number: '03',
+    title: 'Work with your copilot',
+    text: 'Shape a role brief or think through your search.',
+    to: '/ai-chatbot',
+    tone: 'rose',
+  },
+];
+
 const Home = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [jobs, setJobs] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const isRecruiter = user?.role === 'recruiter';
 
-  const handleCreateJob = () => {
-    navigate(isRecruiter ? '/job' : '/ats-score');
-  };
-
   const fetchAllJobs = async () => {
+    setIsLoading(true);
+    setLoadFailed(false);
     try {
       const response = await BackendService(ApiEndpoints.fetchAllJobs, {});
-      if (response.data) {
-        setJobs(response.data);
-      }
+      setJobs(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Failed to fetch jobs:', error);
+      setLoadFailed(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -33,133 +96,157 @@ const Home = () => {
     fetchAllJobs();
   }, []);
 
-  const filteredJobs = jobs.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredJobs = jobs.filter((job) => {
+    const searchableText = [job.title, job.company, job.companyName, job.location]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return searchableText.includes(normalizedSearch);
+  });
 
-  const generateFitValue = (job, index) => {
-    if (job?.matchScore) return job.matchScore;
-    return Math.max(70, 95 - index * 2);
-  };
-
-  const recruiterCards = [
-    { label: 'Live postings', value: jobs.length, detail: 'Open roles in your pipeline' },
-    { label: 'Shortlist ready', value: '12', detail: 'AI-suggested candidates' },
-    { label: 'Hiring pulse', value: '82%', detail: 'Response & interview rate' },
-  ];
-
-  const candidateCards = [
-    { label: 'ATS score', value: '91', detail: 'Resume fit for target roles' },
-    { label: 'Recommended', value: `${filteredJobs.length} roles`, detail: 'AI-picked matches' },
-    { label: 'Profile strength', value: 'Expert', detail: 'Skills and achievements score' },
-  ];
+  const actions = isRecruiter ? recruiterActions : candidateActions;
 
   return (
-    <div className="home-container">
-      <section className="hero-section">
-        <div className="hero-copy">
-          <span className="eyebrow">AI Talent Match</span>
-          <h1>Find the right role or hire the perfect candidate faster.</h1>
-          <p>
+    <div className="home-page">
+      <section className="home-intro">
+        <div className="intro-copy">
+          <p className="home-overline"><span /> {isRecruiter ? 'TALENTAI / HIRING WORKSPACE' : 'TALENTAI / CAREER WORKSPACE'}</p>
+          <h1>
+            {isRecruiter ? <>Meet the people<br />behind the <em>potential.</em></> : <>Find work that<br />fits <em>who you are.</em></>}
+          </h1>
+          <p className="intro-description">
             {isRecruiter
-              ? 'Discover AI candidate recommendations, manage jobs, and build a talent pipeline with recruiter intelligence.'
-              : 'Upload your resume, compare match scores, and get AI-driven improvements for every role.'}
+              ? 'Bring role discovery, candidate conversations, and hiring preparation into one clear workflow.'
+              : 'Keep role discovery, resume fit, and interview preparation in one thoughtful workspace.'}
           </p>
-          <div className="hero-actions">
-            <button className="btn primary-action" onClick={() => navigate(isRecruiter ? '/job' : '/ats-score')}>
-              {isRecruiter ? 'Post a job' : 'Analyze Resume'}
-            </button>
-            <Link to="/ai-chatbot" className="btn secondary-action">
-              Talk to AI
+          <div className="intro-actions">
+            <Link className="button-primary" to={isRecruiter ? '/job' : '/job'}>
+              {isRecruiter ? 'Post a role' : 'Explore roles'}
+              <ArrowUpRight size={17} aria-hidden="true" />
+            </Link>
+            <Link className="button-quiet" to={isRecruiter ? '/connection' : '/ats-score'}>
+              {isRecruiter ? 'Open talent pool' : 'Check resume fit'}
+              <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         </div>
 
-        <aside className="hero-card">
-          <div className="hero-card-title">
-            <h2>{isRecruiter ? 'Recruiter Snapshot' : 'Candidate Snapshot'}</h2>
-            <p>{isRecruiter ? 'Get instant career intelligence and hiring velocity.' : 'Track your resume strength and job match potential.'}</p>
+        <aside className="path-panel" aria-label="A simple job-search flow">
+          <div className="path-panel-head">
+            <div>
+              <span className="path-kicker">A better next step</span>
+              <h2>{isRecruiter ? 'Build your hiring loop' : 'Move with intention'}</h2>
+            </div>
+            <Sparkles size={19} aria-hidden="true" />
           </div>
-          <div className="dashboard-cards">
-            {(isRecruiter ? recruiterCards : candidateCards).map((item, index) => (
-              <div key={index} className="dashboard-card">
-                <span className="dashboard-value">{item.value}</span>
-                <h3>{item.label}</h3>
-                <p>{item.detail}</p>
+          <div className="path-steps">
+            {(isRecruiter ? ['Write a role with clarity', 'Meet relevant candidates', 'Keep the conversation moving'] : ['Discover roles worth your time', 'Understand where you fit', 'Show up ready to interview']).map((step, index) => (
+              <div className="path-step" key={step}>
+                <span className={`path-step-index${index === 0 ? ' is-current' : ''}`}>{String(index + 1).padStart(2, '0')}</span>
+                <p>{step}</p>
+                {index < 2 && <span className="path-step-line" aria-hidden="true" />}
               </div>
             ))}
           </div>
+          <p className="path-panel-foot">One step at a time. Your search stays yours.</p>
         </aside>
       </section>
 
-      <div className="home-content">
-        <div className="home-header">
+      <section className="home-search-section" aria-label="Search jobs">
+        <div className="search-field">
+          <Search size={19} aria-hidden="true" />
           <input
-            type="text"
-            className="search-input"
-            placeholder={isRecruiter ? 'Search job titles or candidate skills...' : 'Search for a job title...'}
+            type="search"
+            aria-label="Search roles, companies, or locations"
+            placeholder="Try a role, company, or location"
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(event) => setSearchTerm(event.target.value)}
           />
-          <button className="btn create-job-btn" onClick={handleCreateJob}>
-            {isRecruiter ? '+ Post Job' : 'Browse Roles'}
-          </button>
-        </div>
-
-        <div className="job-grid">
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map((job, index) => {
-              const fitValue = generateFitValue(job, index);
-              const recruiterHover = [
-                job.applicantCount ? `${job.applicantCount} applicants in pipeline` : 'New candidates waiting review',
-                job.matchScore ? `${job.matchScore}% predicted match` : 'Strong AI relevance',
-                'Recommended for fast outreach',
-              ];
-              return (
-                <Link key={index} to={`/job/${job.id}`} className="job-card">
-                  <div className="job-card-top">
-                    <img src={job.img || demoImage} alt={job.title} className="job-logo" />
-                    {index < 3 && <span className="job-badge">AI Recommended</span>}
-                  </div>
-                  <div className="job-details">
-                    <div className="job-details-row">
-                      <h3>{job.title}</h3>
-                      <span className="fit-chip" title="AI confidence score based on skills, role fit, and job description.">
-                        {fitValue}% fit
-                        <span className="fit-info" aria-hidden="true">ℹ</span>
-                      </span>
-                    </div>
-                    <p>{job.company}</p>
-                    <div className="job-meta-row">
-                      <span>{job.location || 'Remote'}</span>
-                      <span>{job.employmentType || 'Full Time'}</span>
-                    </div>
-                  </div>
-                  {isRecruiter && (
-                    <div className="job-hover-panel">
-                      <span className="hover-title">Recruiter insight</span>
-                      <ul>
-                        {recruiterHover.map((text, idx) => (
-                          <li key={idx}>{text}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  <div className="job-card-footer">
-                    {isRecruiter ? (
-                      <span>{job.applicantCount ? `${job.applicantCount} applicants` : 'AI candidate insights'}</span>
-                    ) : (
-                      <span>{job.ctc || 'Competitive salary'}</span>
-                    )}
-                  </div>
-                </Link>
-              );
-            })
-          ) : (
-            <p className="no-jobs-msg">No jobs found. Try a broader search or create a new job.</p>
+          {searchTerm && (
+            <button type="button" className="clear-search" onClick={() => setSearchTerm('')}>Clear</button>
           )}
         </div>
-      </div>
+        <p className="search-count">
+          {isLoading ? 'Looking across open roles…' : `${filteredJobs.length} ${filteredJobs.length === 1 ? 'role' : 'roles'} to explore`}
+        </p>
+      </section>
+
+      <section className="action-section" aria-labelledby="action-title">
+        <div className="section-heading-row">
+          <div>
+            <p className="section-overline">THE TALENTAI LOOP</p>
+            <h2 id="action-title">A little progress goes a long way.</h2>
+          </div>
+          <Link className="copilot-link" to="/ai-chatbot">
+            <Sparkles size={16} aria-hidden="true" /> Talk it through <ArrowUpRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+        <div className="action-grid">
+          {actions.map((action) => (
+            <Link to={action.to} className="action-card" key={action.title}>
+              <div className={`action-icon ${action.tone}`}>
+                {createElement(action.icon, { size: 19, strokeWidth: 1.8, 'aria-hidden': true })}
+              </div>
+              <span className="action-number">{action.number}</span>
+              <h3>{action.title}</h3>
+              <p>{action.text}</p>
+              <span className="action-arrow" aria-hidden="true"><ArrowUpRight size={17} /></span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="roles-section" aria-labelledby="roles-title">
+        <div className="section-heading-row roles-heading-row">
+          <div>
+            <p className="section-overline">OPEN NOW <span>{String(filteredJobs.length).padStart(2, '0')}</span></p>
+            <h2 id="roles-title">Roles to take a closer look at.</h2>
+            <p className="section-description">Search by title, company, or location. Open a role to see the full brief.</p>
+          </div>
+          <Link className="all-roles-link" to="/job">View all roles <ArrowRight size={16} aria-hidden="true" /></Link>
+        </div>
+
+        {isLoading ? (
+          <div className="roles-state" role="status">Loading open roles…</div>
+        ) : loadFailed ? (
+          <div className="roles-state roles-error" role="alert">
+            <p>We couldn’t load roles just now.</p>
+            <button type="button" onClick={fetchAllJobs}>Try again</button>
+          </div>
+        ) : filteredJobs.length ? (
+          <div className="role-list">
+            {filteredJobs.slice(0, 4).map((job, index) => {
+              const title = job.title || 'Untitled role';
+              const company = job.company || job.companyName || 'Company not listed';
+              const jobId = job.id || job.jobId;
+              const hasMatchScore = job.matchScore !== undefined && job.matchScore !== null && job.matchScore !== '';
+              const matchScore = Number(job.matchScore);
+
+              return (
+                <Link className="role-row" to={jobId ? `/job/${jobId}` : '/job'} key={jobId || `${title}-${index}`}>
+                  <span className={`company-monogram monogram-${index % 4}`} aria-hidden="true">{company.charAt(0).toUpperCase()}</span>
+                  <span className="role-primary">
+                    <strong>{title}</strong>
+                    <span>{company}</span>
+                  </span>
+                  <span className="role-location"><MapPin size={14} aria-hidden="true" />{job.location || 'Location flexible'}</span>
+                  <span className="role-type">{job.employmentType || 'Full time'}</span>
+                  <span className={hasMatchScore && Number.isFinite(matchScore) ? 'match-label has-score' : 'match-label'}>
+                    {hasMatchScore && Number.isFinite(matchScore) ? `${Math.round(matchScore)}% match` : 'View role'}
+                  </span>
+                  <ArrowUpRight className="role-open-icon" size={17} aria-hidden="true" />
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="roles-state">
+            <BriefcaseBusiness size={21} aria-hidden="true" />
+            <p>{searchTerm ? 'No roles match that search. Try a different title or location.' : 'No open roles are available yet. Check back soon.'}</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 };

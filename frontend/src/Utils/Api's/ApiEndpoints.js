@@ -28,8 +28,8 @@ const ApiEndpoints = {
     "checkGoogleToken" : "/api/google/check-token",
 
     // Node Backend API Endpoints
-    "generateATSScore": "/api/ai/generateATSScore",
-     "chatWithAI": "/api/ai/chatWithAI",
+    "generateATSScore": "/ai/generateATSScore",
+    "chatWithAI": "/ai/chatWithAI",
 
     "checkMembership": "/groups/checkMembership",
     "fetchGroupDetails": "/groups/fetchGroupDetails",

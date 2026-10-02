@@ -1,11 +1,12 @@
-import { Socket } from "socket.io-client";
+const gatewayBaseUrl = (
+    import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:7001"
+).replace(/\/+$/, "");
 
 const Property = {
-    BasePath: import.meta.env.VITE_BASE_PATH || "http://localhost:7001",
-    SpringBackendPath: `${import.meta.env.VITE_BASE_PATH || "https://localhost:7006"}/api/v1/core`,
-    NodeBackendPath: `${import.meta.env.VITE_BASE_PATH || "http://localhost:7007"}`,
-    SocketPath: `${import.meta.env.VITE_BASE_PATH || "http://localhost:7007"}/socket.io`,
-    
-}
+    BasePath: gatewayBaseUrl,
+    SpringBackendPath: `${gatewayBaseUrl}/api/v1/core`,
+    NodeBackendPath: `${gatewayBaseUrl}/api/v1/comm`,
+    SocketPath: "/socket.io",
+};
 
 export default Property;

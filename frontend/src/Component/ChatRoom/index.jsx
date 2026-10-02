@@ -53,9 +53,9 @@ const ChatRoom = () => {
   }, [allConnections]);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:7007", {
+    socketRef.current = io(Property.BasePath, {
       autoConnect: false,
-      path: "/socket.io", // Static default path for Socket.io
+      path: Property.SocketPath,
       query: { username },
     });
 

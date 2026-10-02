@@ -4,6 +4,7 @@ import Schedule from "./Schedule";
 import Loader from "../Utility/Loader"
 import { BackendService } from "../../Utils/Api's/ApiMiddleWare";
 import ApiEndpoints from "../../Utils/Api's/ApiEndpoints";
+import Property from "../../Utils/Property";
 
 const MockInterview = () => {
   const [loader, setLoader] = useState(false);
@@ -31,7 +32,7 @@ const MockInterview = () => {
     const top = window.innerHeight / 2 - height / 2;
 
     const authWindow = window.open(
-      "https://localhost:9002/TalentAI/api/google/oauth2/authorize",
+      `${Property.SpringBackendPath}/api/google/oauth2/authorize`,
       "Google OAuth",
       `width=${width},height=${height},top=${top},left=${left}`
     );
