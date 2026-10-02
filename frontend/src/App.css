@@ -1,24 +1,32 @@
 /* Ensure full height for root containers */
 html, body, #root {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent scroll on body */
   font-family: Arial, sans-serif;
+  background-color: #f4f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 /* App container is full height */
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100vh;
+  background-color: #f4f7fb;
 }
 
 /* Space below navbar */
 .main-content {
   flex: 1;
-  overflow-y: auto; /* Scroll only this area if needed */
-  padding-top: 60px; /* Navbar height */
-  background-color: #f9f9f9;
-  height: calc(100vh - 60px); /* Fill remaining height */
+  overflow-y: auto;
+  padding-top: 70px;
+  background-color: #f4f7fb;
 }

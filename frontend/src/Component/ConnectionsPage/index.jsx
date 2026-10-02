@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
 import People from './People';
-import Storage from '../../Utils/Storage';
+import { useAuth } from '../../context/AuthContext';
 import ApiEndpoints from '../../Utils/Api\'s/ApiEndpoints';
 import { BackendService } from '../../Utils/Api\'s/ApiMiddleWare';
 import { useNavigate } from 'react-router-dom';
 
 const ConnectionsPage = () => {
+  const { user } = useAuth();
+  const username = user?.username;
   const navigate = useNavigate();
   const [myConnections, setMyConnections] = useState([]);
   const [pendingConnections, setPendingConnections] = useState([]);
@@ -17,7 +19,7 @@ const ConnectionsPage = () => {
 
   const fetchConnections = async () => {
     const body = {
-      username: Storage.getStorageData('username')
+      username: username
     };
     const response = await BackendService(ApiEndpoints.getConnections, body);
     if (response?.data) {
@@ -30,7 +32,7 @@ const ConnectionsPage = () => {
 
   const sendConnectionRequest = async (targetUsername, message) => {
     const body = {}
-    body.username = Storage.getStorageData('username');
+    body.username = username;
     body.targetUsername = targetUsername; 
     body.message = message;
     const response = await BackendService(ApiEndpoints.sendConnectionRequest, body);
@@ -46,7 +48,7 @@ const ConnectionsPage = () => {
   const acceptPendingRequest = async (bd) => {
     console.log("Accepting pending request for: ", bd);
     const body = {
-      username: Storage.getStorageData('username'),
+      username: username,
       targetUsername : bd.username
     };
 

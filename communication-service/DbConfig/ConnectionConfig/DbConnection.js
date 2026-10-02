@@ -1,75 +1,72 @@
-// dbConnect.js
-import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 const url = process.env.MONGO_URL;
-const client = new MongoClient(url);
+if (!url) {
+  throw new Error('MONGO_URL environment variable is required');
+}
 
-let privateMessageCollection; 
+const client = new MongoClient(url, {
+  serverSelectionTimeoutMS: 5000,
+});
+
+let privateMessageCollection;
 let groupMessageCollection;
 let groupDetailCollection;
 let groupJoinRequestCollection;
-let atsCachingCollection
-  
+let atsCachingCollection;
+
 async function ConnectToMongo() {
-    try {
-        await client.connect();
-        console.log("✅ Connected to MongoDB");
+  try {
+    await client.connect();
+    console.log('✅ Connected to MongoDB');
 
-        const db = client.db("TalentAI");
-        privateMessageCollection = db.collection("Private-Messages");
-        groupMessageCollection = db.collection("Group-Messages");
-        groupDetailCollection = db.collection("Group-Details");
-        groupJoinRequestCollection = db.collection("Group-Join-Requests");
-        atsCachingCollection = db.collection("ATS-Caching");
-    } catch (err) {
-        console.error("❌ MongoDB connection error:", err);
-    }
+    const db = client.db(process.env.MONGO_DB_NAME || 'TalentAI');
+    privateMessageCollection = db.collection('Private-Messages');
+    groupMessageCollection = db.collection('Group-Messages');
+    groupDetailCollection = db.collection('Group-Details');
+    groupJoinRequestCollection = db.collection('Group-Join-Requests');
+    atsCachingCollection = db.collection('ATS-Caching');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err);
+    throw err;
+  }
 }
 
-// Function to get the collection
+function ensureCollection(collection, name) {
+  if (!collection) {
+    throw new Error(`Collection ${name} not initialized. Call ConnectToMongo() first.`);
+  }
+  return collection;
+}
+
 async function GetPrivateMessageCollectionInstance() {
-    if (!privateMessageCollection) {
-        throw new Error("Collection not initialized. Call ConnectToMongo() first.");
-    }
-    return privateMessageCollection;
+  return ensureCollection(privateMessageCollection, 'Private-Messages');
 }
+
 async function GetGroupMessageCollectionInstance() {
-    if (!groupMessageCollection) {
-        throw new Error("Collection not initialized. Call ConnectToMongo() first.");
-    }
-    return groupMessageCollection;
+  return ensureCollection(groupMessageCollection, 'Group-Messages');
 }
 
 async function GetGroupDetailCollectionInstance() {
-    if (!groupDetailCollection) {
-        throw new Error("Collection not initialized. Call ConnectToMongo() first.");
-    }
-    return groupDetailCollection;
+  return ensureCollection(groupDetailCollection, 'Group-Details');
 }
 
 async function GetGroupJoinRequestCollectionInstance() {
-    if (!groupJoinRequestCollection) {
-        throw new Error("Collection not initialized. Call ConnectToMongo() first.");
-    }
-    return groupJoinRequestCollection;
+  return ensureCollection(groupJoinRequestCollection, 'Group-Join-Requests');
 }
 
 async function GetATSCachingCollectionInstance() {
-    if (!atsCachingCollection) {
-        throw new Error("Collection not initialized. Call ConnectToMongo() first.");
-    }
-    return atsCachingCollection;
+  return ensureCollection(atsCachingCollection, 'ATS-Caching');
 }
 
-
 export {
-    ConnectToMongo,
-    GetPrivateMessageCollectionInstance,
-    GetGroupMessageCollectionInstance,
-    GetGroupDetailCollectionInstance,
-    GetGroupJoinRequestCollectionInstance,
-    GetATSCachingCollectionInstance
+  ConnectToMongo,
+  GetPrivateMessageCollectionInstance,
+  GetGroupMessageCollectionInstance,
+  GetGroupDetailCollectionInstance,
+  GetGroupJoinRequestCollectionInstance,
+  GetATSCachingCollectionInstance,
 };

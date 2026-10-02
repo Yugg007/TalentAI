@@ -5,6 +5,7 @@ const ApiEndpoints = {
     "authStatus" : "/user/authStatus",
     "logout" : "/user/logout",
     "updatePersonInfo" : "user/updatePersonInfo",
+    "downloadResume" : "user/downloadResume",
     "fetchUserByUsername": "/user/fetchUserByUsername",
 
     "getConnections" : "/connection/loadConnections",
@@ -30,14 +31,14 @@ const ApiEndpoints = {
     "generateATSScore": "/api/ai/generateATSScore",
      "chatWithAI": "/api/ai/chatWithAI",
 
-    "checkMembership": "/api/groups/checkMembership",
-    "fetchGroupDetails": "/api/groups/fetchGroupDetails",
-    "createGroup": "/api/groups/createGroup",
-    "askToJoinGroup": "/api/groups/askToJoin",
-    "updateAskToJoinStatus": "/api/groups/updateAskToJoinStatus",
+    "checkMembership": "/groups/checkMembership",
+    "fetchGroupDetails": "/groups/fetchGroupDetails",
+    "createGroup": "/groups/createGroup",
+    "askToJoinGroup": "/groups/askToJoin",
+    "updateAskToJoinStatus": "/groups/updateAskToJoinStatus",
     
-    "fetchGroupMessages": "/api/messages/fetchGroupMessages",
-    "fetchPrivateMessages": "/api/messages/fetchPrivateMessage",
+    "fetchGroupMessages": "/messages/fetchGroupMessages",
+    "fetchPrivateMessages": "/messages/fetchPrivateMessage",
     
 }
 

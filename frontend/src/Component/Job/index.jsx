@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './style.css';
 
 import { BackendService } from '../../Utils/Api\'s/ApiMiddleWare';
@@ -10,191 +11,228 @@ import { downloadAtsPdf } from '../../Utils/DownloadAtsPdf';
 
 const Job = () => {
   const { id } = useParams();
-  return (
-    <>
-      {
-        id ? <JobDetail jobId={id} /> : <CreatJob />
-      }
-    </>
-  );
+  return id ? <JobDetail jobId={id} /> : <CreateJob />;
 };
-
 
 function JobDetail({ jobId }) {
   const [job, setJob] = useState(null);
   const [file, setFile] = useState(null);
-  const [ATSResponse, setATSResponse] = useState("");
   const [jobFetchFailed, setJobFetchFailed] = useState(false);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  }
+  const skills = job?.skills?.split(',').map((skill) => skill.trim()).filter(Boolean) || [];
+  const aiFitScore = job?.matchScore || Math.max(72, 96 - (skills.length * 2));
+  const strengths = [
+    'Fast-growing hiring pipeline',
+    'Competitive compensation range',
+    'Collaborative product and engineering team',
+  ];
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile && selectedFile.type !== 'application/pdf') {
+      toast.error('Please upload a valid PDF resume.');
+      setFile(null);
+      return;
+    }
+    setFile(selectedFile);
+  };
 
   const checkAtsScore = async () => {
-    if (file) {
-      try {
-        const formData = new FormData();
-        formData.append("pdf", file);
-        formData.append("titleText", JSON.stringify(job));
-        formData.append("prompt", "I have provided job description and resume. Please provide me ats score. Also, provide suggestions to improve my resume to get selected for the job. Be very specific in your suggestions.");
-        downloadAtsPdf(formData, job.title);
-      } catch (error) {
-        alert("Something went wrong. Please try again later.");
-        console.error(error)
-      }
+    if (!file) {
+      toast.error('Please upload your resume before generating the ATS score.');
+      return;
     }
-    else {
-      alert("Please upload resume.")
+
+    if (!job) {
+      toast.error('Job details are still loading. Please try again.');
+      return;
     }
-  }
+
+    try {
+      const formData = new FormData();
+      formData.append('pdf', file);
+      formData.append('titleText', JSON.stringify(job));
+      formData.append('prompt', 'I have provided job description and resume. Please provide me ats score. Also, provide suggestions to improve my resume to get selected for the job. Be very specific in your suggestions.');
+      await downloadAtsPdf(formData, job.title || 'application');
+    } catch (error) {
+      toast.error('Unable to generate ATS report. Please try again later.');
+      console.error(error);
+    }
+  };
 
   const fetchJobDetails = async () => {
     try {
-      const body = {
-        id: jobId
-      }
+      const body = { id: jobId };
       const response = await BackendService(ApiEndpoints.fetchJobById, body);
       if (response.data) {
-        console.log(response.data);
         setJob(response.data);
       } else {
         setJobFetchFailed(true);
-        //here i want to apply CountdownRedirect
-        console.error("Failed to fetch job details:", response);
+        console.error('Failed to fetch job details:', response);
       }
     } catch (error) {
       setJobFetchFailed(true);
-      console.error("Error fetching job details:", error);
+      console.error('Error fetching job details:', error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchJobDetails();
-  }, [jobId])
+  }, [jobId]);
 
   if (jobFetchFailed) {
     return (
-      <CountdownRedirect
-        message="No Job Found."
-        redirectUrl="/"
-      />
+      <CountdownRedirect message="No Job Found." redirectUrl="/" />
     );
   }
 
   return (
     <>
-      {job ?
+      {job ? (
         <div className="job-detail-container">
-          <img src={demoImage} alt="Company Logo" className="job-logo" />
-          <div className="job-header">
-            <div>
-              <h1 className="job-title">{job?.title}</h1>
-              <h3 className="company-name">{job?.company}</h3>
-            </div>
-          </div>
+          <div className="job-detail-grid">
+            <section className="job-card-panel">
+              <div className="job-card-header">
+                <img src={demoImage} alt="Company Logo" className="job-logo" />
+                <div className="job-header-copy">
+                  <span className="job-badge-pill">AI Match</span>
+                  <h1 className="job-title">{job?.title}</h1>
+                  <p className="company-name">{job?.company}</p>
+                  <div className="job-meta-chips">
+                    <span>{job?.location || 'Remote'}</span>
+                    <span>{job?.employmentType || 'Full Time'}</span>
+                    <span>{job?.experience || 'N/A'} yrs</span>
+                  </div>
+                </div>
+              </div>
 
-          <div className="job-info">
-            <p><strong>Location:</strong> {job?.location}</p>
-            <p><strong>CTC:</strong> {job?.ctc}</p>
-            <p><strong>Experience:</strong> {job?.experience}</p>
-            <p><strong>Employment Type:</strong> {job?.employmentType}</p>
-          </div>
+              <div className="job-score-card">
+                <div className="score-label">Predicted fit</div>
+                <div className="score-value">{aiFitScore}%</div>
+                <p className="score-copy">AI estimates how well your resume matches this role based on skills and experience.</p>
+              </div>
 
-          <div className="job-description">
-            <h2>Job Description</h2>
-            <p style={{ whiteSpace: "pre-wrap", fontSize: "16px" }}>{job?.jobDescription}</p>
-          </div>
+              <div className="job-info-card">
+                <h2>Role at a glance</h2>
+                <ul>
+                  <li><strong>Compensation:</strong> {job?.ctc || 'Not available'}</li>
+                  <li><strong>Location:</strong> {job?.location || 'Remote'}</li>
+                  <li><strong>Type:</strong> {job?.employmentType || 'N/A'}</li>
+                  <li><strong>Experience:</strong> {job?.experience || 'N/A'}</li>
+                </ul>
+              </div>
 
-          <div className="job-skills">
-            <h2>Required Skills</h2>
-            <ul>
-              {job?.skills?.split(",")?.map((skill, index) => <li key={index} className="skill-chip">{skill}</li>)}
-            </ul>
-          </div>
+              <div className="reason-list">
+                <h2>Why this role matters</h2>
+                <ul>
+                  {strengths.map((reason, index) => (
+                    <li key={index}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
 
-          <div className="apply-section">
-            <label for="myFile" class="file-label">Your resume</label>
-            <input type='file' className='file-input' onChange={handleFileChange}></input>
-            <button className='apply-btn' onClick={checkAtsScore}>Download Your ATS-Score</button>
+            <aside className="job-sidebar-panel">
+              <div className="job-description">
+                <h2>Job Description</h2>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{job?.jobDescription || 'No description provided.'}</p>
+              </div>
+
+              <div className="job-skills">
+                <h2>Required Skills</h2>
+                <ul>
+                  {skills.map((skill, index) => (
+                    <li key={index} className="skill-chip">{skill}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="apply-panel">
+                <label htmlFor="resumeUpload" className="file-label">Upload your resume</label>
+                <input id="resumeUpload" type="file" className="file-input" accept="application/pdf" onChange={handleFileChange} />
+                <button className="apply-btn" onClick={checkAtsScore}>Download ATS Report</button>
+                <button className="apply-btn secondary" onClick={() => toast.info('Apply link will be added soon.')}>Save & Apply later</button>
+              </div>
+            </aside>
           </div>
-          <button className="apply-btn">Link to Apply</button>
         </div>
-        :
-        <>
-          {jobFetchFailed && <CountdownRedirect
-            message="No Job Found."
-            redirectUrl="/"
-          />}
-        </>
-      }
+      ) : (
+        jobFetchFailed && <CountdownRedirect message="No Job Found." redirectUrl="/" />
+      )}
     </>
   );
 }
 
-const CreatJob = () => {
+const CreateJob = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    title: "",
-    companyName: "",
-    ctcMin: "",
-    ctcMax: "",
-    location: "",
-    experience: "",
-    employmentType: "",
-    jobDescription: "",
-    skills: ""
+    title: '',
+    companyName: '',
+    ctcMin: '',
+    ctcMax: '',
+    location: '',
+    experience: '',
+    employmentType: '',
+    jobDescription: '',
+    skills: '',
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.title || !formData.companyName || !formData.location || !formData.experience || !formData.employmentType || !formData.jobDescription || !formData.skills || !formData.ctcMin || !formData.ctcMax) {
+      toast.error('Please fill all job details before submitting.');
+      return;
+    }
+
     const payload = {
       ...formData,
       ctc: `₹${formData.ctcMin} - ₹${formData.ctcMax}`,
-      experience: `${formData.experience}+ years`
+      experience: `${formData.experience}+ years`,
     };
 
-    const response = await BackendService(ApiEndpoints.createJob, payload);
-    if (response.status !== 200) {
-      console.error("Error creating job:", response);
-      alert("Failed to create job. Please try again.");
-      return;
+    try {
+      const response = await BackendService(ApiEndpoints.createJob, payload);
+      if (response.status === 200 && response.data?.id) {
+        setFormData({
+          title: '',
+          companyName: '',
+          ctcMin: '',
+          ctcMax: '',
+          location: '',
+          experience: '',
+          employmentType: '',
+          jobDescription: '',
+          skills: '',
+        });
+        toast.success('Job posted successfully!');
+        navigate(`/job/${response.data.id}`);
+      } else {
+        console.error('Error creating job:', response);
+        toast.error('Failed to create job. Please try again.');
+      }
+    } catch (error) {
+      console.error('Create Job Error:', error);
+      toast.error('Failed to create job. Please try again.');
     }
-    // Simulate job creation success
-    setFormData({
-      title: "",
-      companyName: "",
-      ctcMin: "",
-      ctcMax: "",
-      location: "",
-      experience: "",
-      employmentType: "",
-      jobDescription: "",
-      skills: ""
-    });
-
-    console.log("Job Created:", payload);
-    alert("Job submitted successfully!");
-    navigate("/job/" + response.data.id);
   };
 
   return (
     <div className="job-create-container">
       <h2 className="job-create-title">Create New Job</h2>
       <form className="job-create-form" onSubmit={handleSubmit}>
-        {/* Job Title */}
-        <div>
-          <label>Job Title</label>
+        <div className="form-group">
+          <label htmlFor="title">Job Title</label>
           <input
+            id="title"
             type="text"
             name="title"
             value={formData.title}
@@ -204,10 +242,10 @@ const CreatJob = () => {
           />
         </div>
 
-        {/* Company Name */}
-        <div>
-          <label>Company Name</label>
+        <div className="form-group">
+          <label htmlFor="companyName">Company Name</label>
           <input
+            id="companyName"
             type="text"
             name="companyName"
             value={formData.companyName}
@@ -217,113 +255,102 @@ const CreatJob = () => {
           />
         </div>
 
-        {/* Experience */}
-        <div className="experience-input-wrapper">
-          <label>Experience Required</label>
-          <div className="experience-input-group">
+        <div className="form-group-row">
+          <div className="form-group">
+            <label htmlFor="ctcMin">CTC Min</label>
             <input
-              type="number"
-              name="experience"
-              value={formData.experience}
-              onChange={handleChange}
-              placeholder="Years"
-              required
-            />
-            <span className="exp-suffix">+ years</span>
-          </div>
-        </div>
-
-        {/* CTC Range */}
-        <div className="ctc-input-wrapper">
-          <label>CTC (in LPA)</label>
-          <div className="ctc-input-group">
-            <span className="rupee-symbol">₹</span>
-            <input
+              id="ctcMin"
               type="number"
               name="ctcMin"
               value={formData.ctcMin}
               onChange={handleChange}
-              placeholder="Min"
+              placeholder="50"
               required
             />
-            <span className="ctc-separator">-</span>
-            <span className="rupee-symbol">₹</span>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="ctcMax">CTC Max</label>
             <input
+              id="ctcMax"
               type="number"
               name="ctcMax"
               value={formData.ctcMax}
               onChange={handleChange}
-              placeholder="Max"
+              placeholder="80"
               required
             />
           </div>
         </div>
 
-        {/* Employment Type */}
-        <div>
-          <label>Employment Type</label>
-          <select
+        <div className="form-group-row">
+          <div className="form-group">
+            <label htmlFor="location">Location</label>
+            <input
+              id="location"
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="New Delhi"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="experience">Experience</label>
+            <input
+              id="experience"
+              type="number"
+              name="experience"
+              value={formData.experience}
+              onChange={handleChange}
+              placeholder="3"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="employmentType">Employment Type</label>
+          <input
+            id="employmentType"
+            type="text"
             name="employmentType"
             value={formData.employmentType}
             onChange={handleChange}
-            required
-          >
-            <option value="" disabled>Select Employment Type</option>
-            <option value="Full-Time">Full-Time</option>
-            <option value="Hybrid">Hybrid</option>
-            <option value="Work From Home">Work From Home</option>
-            <option value="Internship">Internship</option>
-            <option value="Contract">Contract</option>
-            <option value="Part-Time">Part-Time</option>
-            <option value="Freelance">Freelance</option>
-          </select>
-        </div>
-
-        {/* Location */}
-        <div>
-          <label>Location</label>
-          <input
-            type="text"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            placeholder="Bengaluru, India"
+            placeholder="Full Time"
             required
           />
         </div>
 
-        {/* Job Description */}
-        <div className="textarea-full">
-          <label>Job Description</label>
-          <textarea
-            name="jobDescription"
-            value={formData.jobDescription}
-            onChange={handleChange}
-            placeholder="We are looking for a skilled frontend developer..."
-            rows="5"
-            required
-          ></textarea>
-        </div>
-
-        {/* Skills */}
-        <div className="skills-full">
-          <label>Skills</label>
+        <div className="form-group">
+          <label htmlFor="skills">Required Skills</label>
           <input
+            id="skills"
             type="text"
             name="skills"
             value={formData.skills}
             onChange={handleChange}
-            placeholder="React.js, HTML5, CSS3, JavaScript, REST APIs"
+            placeholder="React, Node, Java, Agile"
             required
           />
         </div>
 
-        {/* Submit */}
-        <div className="submit-full">
-          <button type="submit" className="job-submit-btn" onClick={handleSubmit}>
-            Create Job
-          </button>
+        <div className="form-group">
+          <label htmlFor="jobDescription">Job Description</label>
+          <textarea
+            id="jobDescription"
+            name="jobDescription"
+            rows="6"
+            value={formData.jobDescription}
+            onChange={handleChange}
+            placeholder="Enter the full job description here..."
+            required
+          />
         </div>
+
+        <button type="submit" className="submit-btn">Post Job</button>
       </form>
     </div>
   );

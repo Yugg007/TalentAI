@@ -13,17 +13,13 @@ import {
 
 function registerSocketHandlers(io) {
   io.on("connection", (socket) => {
-    const username = socket.handshake.query.username;
+    console.log("🔌 New client connected: ", socket.id);
+    const username = socket.handshake.auth?.username || socket.handshake.query?.username;
     if (username) {
-      //add user to the users list
       addUser(username, socket.id);
-
-      // Emit the user's ID and all users to the client
-      socket.emit("yourID", socket.id);
-      io.sockets.emit("allUsers", getAllUsers());
-
-      console.log(`${username} connected, socketId: ${socket.id}`);
-      console.log("🔗 New user connected: ", socket.id);
+      socket.emit('connected', { socketId: socket.id, username });
+      io.sockets.emit('allUsers', getAllUsers());
+      console.log(`🔗 User connected: ${username} (${socket.id})`);
     }
 
     // Handle user disconnection
@@ -34,34 +30,45 @@ function registerSocketHandlers(io) {
     });
 
     // Handle incoming private messages
-    socket.on("sendPrivateMessage", (message) => {
-      console.log(`📩 Message from ${message.sender} to ${message.receiver}:`, message);
-      const receiverSocketId = getUserSocketId(message.receiver);
-      console.log(`Receiver socket ID for ${message.receiver}:`, receiverSocketId);
-      console.log("Get all user socket IDs:", getAllUsers());
-      if (receiverSocketId) {
-        console.log(`📩 Sending message from ${message.sender} to ${message.receiver}`);
-        io.to(receiverSocketId).emit("receiveMessage", message);
+    socket.on('sendPrivateMessage', async (message) => {
+      try {
+        if (!message || !message.sender || !message.receiver || !message.message) {
+          return socket.emit('error', { message: 'Invalid private message payload' });
+        }
+
+        const receiverSocketId = getUserSocketId(message.receiver);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit('receiveMessage', message);
+        }
+
+        await savePrivateMessage(message);
+      } catch (error) {
+        console.error('Error handling sendPrivateMessage:', error);
+        socket.emit('error', { message: 'Unable to save private message' });
       }
-      savePrivateMessage(message);
-      console.log("✅ Private message saved successfully");
     });
 
     // Handle incoming group messages
-    socket.on("sendGroupMessage", (message) => {
-      console.log(`📩 Group message from ${message.sender} in group ${message.groupName}:`, message);
-      const groupSocketIds = getGroupSocketIds(message.members);
-      const senderSocketId = getUserSocketId(message.sender);
-      if (groupSocketIds.length > 0) {
-        groupSocketIds.forEach(socketId => {
-          if (senderSocketId && socketId !== senderSocketId) {
-            console.log(`📩 Sending group message from ${message.sender} to group members`);
-            io.to(socketId).emit("receiveMessage", message);
+    socket.on('sendGroupMessage', async (message) => {
+      try {
+        if (!message || !message.sender || !message.groupName || !Array.isArray(message.members)) {
+          return socket.emit('error', { message: 'Invalid group message payload' });
+        }
+
+        const recipientSocketIds = getGroupSocketIds(message.members);
+        const senderSocketId = getUserSocketId(message.sender);
+
+        recipientSocketIds.forEach((socketId) => {
+          if (socketId !== senderSocketId) {
+            io.to(socketId).emit('receiveMessage', message);
           }
         });
+
+        await saveGroupMessage(message);
+      } catch (error) {
+        console.error('Error handling sendGroupMessage:', error);
+        socket.emit('error', { message: 'Unable to save group message' });
       }
-      saveGroupMessage(message);
-      console.log("✅ Group message saved successfully");
     });
 
 
@@ -74,11 +81,19 @@ function registerSocketHandlers(io) {
     });
 
     socket.on('answer', (data) => {
-      socket.to(data.roomId).emit('answer', data);
+      if (data?.roomId) {
+        socket.to(data.roomId).emit('answer', data);
+      }
     });
 
     socket.on('ice-candidate', (data) => {
-      socket.to(data.roomId).emit('ice-candidate', data);
+      if (data?.roomId) {
+        socket.to(data.roomId).emit('ice-candidate', data);
+      }
+    });
+
+    socket.on('error', (error) => {
+      console.error('Socket error:', error);
     });
 
 

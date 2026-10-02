@@ -2,11 +2,11 @@ import { io } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import Storage from "../../Utils/Storage";
 import PrivateChat from "./PrivateChat";
 import GroupChat from "./GroupChat";
 import { BackendService, NodeBackendService } from "../../Utils/Api's/ApiMiddleWare";
 import ApiEndpoints from "../../Utils/Api's/ApiEndpoints";
+import { useAuth } from '../../context/AuthContext';
 
 import "./ChatRoom.css";
 import Property from "../../Utils/Property";
@@ -15,7 +15,8 @@ const ChatRoom = () => {
   const location = useLocation();
   const { state } = location;
   console.log("State:", state?.allConnections);
-  const username = Storage.getStorageData("username");
+  const { user } = useAuth();
+  const username = user?.username;
   const friendUsername = state?.friendUsername;
   const [allConnections, setAllConnections] = useState(state?.allConnections || []);
 
@@ -52,8 +53,9 @@ const ChatRoom = () => {
   }, [allConnections]);
 
   useEffect(() => {
-    socketRef.current = io(Property.NodeBackendPath, {
+    socketRef.current = io("http://localhost:7007", {
       autoConnect: false,
+      path: "/socket.io", // Static default path for Socket.io
       query: { username },
     });
 

@@ -1,82 +1,79 @@
-import express from "express";
+import express from 'express';
 
-import { upload } from "../Utils/FileHandle.js";
-import { AtsResponseFromCache, saveAtsResponseToCache } from "../DbConfig/CrudConfig/AtsCache.js";
-import { callCohereAi, callCohereChatBot } from "../Apis/Cohere.js";
-import hashData from "../Utils/HashData.js";
-import { extractTextFromPdf } from "../Utils/ExtractText.js";
+import { upload } from '../Utils/FileHandle.js';
+import { AtsResponseFromCache, saveAtsResponseToCache } from '../DbConfig/CrudConfig/AtsCache.js';
+import { callCohereAi, callCohereChatBot } from '../Apis/Cohere.js';
+import hashData from '../Utils/HashData.js';
+import { extractTextFromPdf } from '../Utils/ExtractText.js';
 
 const router = express.Router();
 
-router.post("/generateATSScore", upload.single('pdf'), async (req, res) => {
-    const pdfFile = req.file;
-    const titleText = req.body.titleText;
-    const title = req.body.title || "Job Description";
-    const prompt = req.body.prompt;
+router.post('/generateATSScore', upload.single('pdf'), async (req, res) => {
+  const pdfFile = req.file;
+  const titleText = req.body.titleText;
+  const title = req.body.title?.trim() || 'Job Description';
+  const prompt = req.body.prompt?.trim() || '';
 
+  if (!pdfFile) {
+    return res.status(400).json({ error: 'PDF file is missing' });
+  }
 
+  if (!titleText) {
+    return res.status(400).json({ error: 'titleText is required' });
+  }
 
-    console.log("Received titleText:", titleText);
-    console.log("Received title:", title);
-    console.log("Received prompt:", prompt);
-
-
-    if (!pdfFile) {
-        return res.status(400).json({ error: 'PDF file is missing' });
-    }
-
-    if (!titleText) {
-        return res.status(400).json({ error: 'Text is missing' });
-    }
-
+  try {
     const extractedPdfText = await extractTextFromPdf(pdfFile);
+    if (!extractedPdfText) {
+      return res.status(500).json({ error: 'Unable to extract text from PDF' });
+    }
 
     const pdfHash = hashData(extractedPdfText);
     const titleTextHash = hashData(titleText);
-    console.log(pdfHash);
-    console.log(titleTextHash);
 
     const cacheResponse = await AtsResponseFromCache(pdfHash, titleTextHash);
     if (cacheResponse) {
-        console.log("Cache hit");
-        return res.status(200).json({ response: cacheResponse?.content });
+      return res.status(200).json({ response: cacheResponse.content });
     }
 
-    const requestStr = "My resume - " + extractedPdfText + ". " + title + " - " + titleText + ". " + prompt + ". ";
-    console.log("Request string to Cohere AI:", requestStr);
+    const requestStr = `My resume - ${extractedPdfText}. ${title} - ${titleText}. ${prompt}`;
     const content = await callCohereAi(requestStr);
-    console.log("Cohere AI response:", content?.toString());
 
-
-    saveAtsResponseToCache({ pdfHash, titleTextHash, content });
-    res.status(200).json({ response: content });
+    await saveAtsResponseToCache({ pdfHash, titleTextHash, content });
+    return res.status(200).json({ response: content });
+  } catch (error) {
+    console.error('Error generating ATS score:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-
-router.post("/chatWithAI", async (req, res) => {
-    const messages = JSON.parse(req.body.messages);
-
-    if (!messages) {
-        return res.status(400).json({ error: 'Messages is missing' });
+router.post('/chatWithAI', async (req, res) => {
+  let messages = req.body.messages;
+  if (typeof messages === 'string') {
+    try {
+      messages = JSON.parse(messages);
+    } catch (error) {
+      return res.status(400).json({ error: 'messages must be valid JSON' });
     }
+  }
 
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'messages must be a non-empty array' });
+  }
 
-    let conversation = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\n";
+  try {
+    const conversation = messages.reduce((acc, msg) => {
+      if (msg.role === 'user') return `${acc}User: ${msg.content}\n`;
+      if (msg.role === 'assistant') return `${acc}Assistant: ${msg.content}\n`;
+      return acc;
+    }, 'The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\n');
 
-    messages?.forEach((msg) => {
-        if (msg.role === "user") {
-            conversation += `User: ${msg.content}\n`;
-        } else if (msg.role === "assistant") {
-            conversation += `Assistant: ${msg.content}\n`;
-        }
-    });
-
-    console.log("Full conversation:", conversation);
-
-    const response = await callCohereChatBot(conversation + "Assistant: ");
-    console.log("Cohere AI chat response:", response);
-
-    res.status(200).send({ reply: response});
+    const response = await callCohereChatBot(`${conversation}Assistant: `);
+    return res.status(200).json({ reply: response });
+  } catch (error) {
+    console.error('Error chatting with AI:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 export default router;

@@ -1,62 +1,72 @@
 import React, { useState, useEffect } from "react";
 import { FaUser, FaEnvelope, FaArrowRight, FaIdBadge } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
+import { toast } from "react-toastify";
 import { BackendService } from '../../Utils/Api\'s/ApiMiddleWare';
 import ApiEndpoints from '../../Utils/Api\'s/ApiEndpoints';
 import './style.css';
 import ProfileSection from "./ProfileSection";
-import Storage from "../../Utils/Storage";
+import { useAuth } from '../../context/AuthContext';
 
-const LoginPage = ({ isLoggerIn, setIsLoggedIn, user, setUser, authStatus }) => {
+const LoginPage = () => {
+  const { isLoggedIn, setIsLoggedIn, user, setUser, authStatus } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("Test@1234");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("candidate");
 
   const handleSubmit = async () => {
-    try {
-      const userPayload = {
-        username,
-        email,
-        password,
-        firstName: name
-      };
+    if (!email.trim() || !password.trim()) {
+      toast.error("Email and password are required.");
+      return;
+    }
 
+    if (!isLogin && !username.trim()) {
+      toast.error("Please choose a username.");
+      return;
+    }
+
+    const userPayload = isLogin
+      ? { email, password }
+      : { username, email, password, firstName: name, role };
+
+    try {
       const response = await BackendService(
         isLogin ? ApiEndpoints.login : ApiEndpoints.register,
         userPayload
       );
 
       if (response?.data) {
-        Storage.setStorageData("username", response?.data.username);
         setUser(response.data);
         setIsLoggedIn(true);
+        toast.success(isLogin ? "Welcome back!" : "Account created successfully.");
       } else {
-        alert("Login/Register failed. Please check credentials.");
+        toast.error("Login/Register failed. Please check your credentials.");
       }
     } catch (err) {
       console.error("Login/Register Error:", err);
-      alert("Something went wrong.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
   useEffect(() => {
-    if (user == null) {
+    if (!user) {
       authStatus();
     }
   }, [user]);
 
   return (
     <>
-      {isLoggerIn ? (
+      {isLoggedIn ? (
         <div className="profile-wrapper">
           <ProfileSection user={user} setUser={setUser} />
         </div>
       ) : (
         <div className="auth-wrapper">
           <div className="auth-card">
-            <h2>{isLogin ? "Login to Continue" : "Create an Account"}</h2>
+            <h2>{isLogin ? "Login to Continue" : "Create your Talent AI account"}</h2>
 
             <div className="input-group">
               <FaEnvelope className="icon" />
@@ -67,8 +77,6 @@ const LoginPage = ({ isLoggerIn, setIsLoggedIn, user, setUser, authStatus }) => 
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-
-
 
             {!isLogin && (
               <div className="input-group">
@@ -87,17 +95,45 @@ const LoginPage = ({ isLoggerIn, setIsLoggedIn, user, setUser, authStatus }) => 
                 <FaIdBadge className="icon" />
                 <input
                   type="text"
-                  placeholder="Name"
+                  placeholder="Full Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
             )}
 
+            {!isLogin && (
+              <div className="role-selector">
+                <span className="role-label">Account type</span>
+                <div className="radio-group">
+                  <label className={`role-option ${role === "candidate" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="role"
+                      value="candidate"
+                      checked={role === "candidate"}
+                      onChange={() => setRole("candidate")}
+                    />
+                    Candidate
+                  </label>
+                  <label className={`role-option ${role === "recruiter" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="role"
+                      value="recruiter"
+                      checked={role === "recruiter"}
+                      onChange={() => setRole("recruiter")}
+                    />
+                    Recruiter
+                  </label>
+                </div>
+              </div>
+            )}
+
             <div className="input-group">
               <RiLockPasswordLine className="icon" />
               <input
-                type="text"
+                type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -109,8 +145,7 @@ const LoginPage = ({ isLoggerIn, setIsLoggedIn, user, setUser, authStatus }) => 
             </button>
 
             <p className="toggle-text">
-              {isLogin ? "Don't have an account?" : "Already a user?"}{" "}
-              <span onClick={() => setIsLogin(!isLogin)}>
+              {isLogin ? "Don't have an account?" : "Already a user?"} <span onClick={() => setIsLogin(!isLogin)}>
                 {isLogin ? "Sign Up" : "Login"}
               </span>
             </p>
@@ -120,21 +155,5 @@ const LoginPage = ({ isLoggerIn, setIsLoggedIn, user, setUser, authStatus }) => 
     </>
   );
 };
-
-// const ProfileSection = ({ user }) => {
-//   console.log(user)
-//   return (
-//     <div className="profile-card">
-//       <h2 className="profile-name">{user?.personInfos?.firstName || user.username}</h2>
-//       <p className="profile-email">{user?.email}</p>
-
-//       <div className="profile-info">
-//         <p><strong>Skills:</strong> {user?.personInfos?.skills || "N/A"}</p>
-//         <p><strong>Education:</strong> {user?.personInfos?.education || "N/A"}</p>
-//         <p><strong>Description:</strong> {user?.personInfos?.description || "N/A"}</p>
-//       </div>
-//     </div>
-//   );
-// };
 
 export default LoginPage;

@@ -3,10 +3,12 @@ import { BackendService } from '../../Utils/Api\'s/ApiMiddleWare';
 import ApiEndpoints from '../../Utils/Api\'s/ApiEndpoints';
 import './style.css';
 import MultiSelect from '../Utility/MultiSelect/MultiSelect';
-import Storage from '../../Utils/Storage';
 import Loader from '../Utility/Loader';
+import { useAuth } from '../../context/AuthContext';
 
 const Schedule = ({ handleGoogleAuth, checkGoogleToken }) => {
+    const { user } = useAuth();
+    const username = user?.username;
     const [activeTab, setActiveTab] = useState('upcoming');
     const [meetingTitle, setMeetingTitle] = useState("");
     const [meetingDate, setMeetingDate] = useState("");
@@ -19,7 +21,7 @@ const Schedule = ({ handleGoogleAuth, checkGoogleToken }) => {
 
     const fetchUsers = async () => {
         const body = {
-            username: Storage.getStorageData('username')
+            username: username
         };
         const response = await BackendService(ApiEndpoints.getConnections, body);
         if (response?.data) {
@@ -205,7 +207,7 @@ const Schedule = ({ handleGoogleAuth, checkGoogleToken }) => {
                                                     </a>
                                                 )}
                                                 {
-                                                    (meeting.admin === Storage.getStorageData('username'))
+                                                    (meeting.admin === username)
                                                     &&
                                                     <button
                                                         className="delete-btn"

@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
-import { NodeBackendInstance } from "./AxiosInstance";
 import { NodeBackendService } from "./Api's/ApiMiddleWare";
 import ApiEndpoints from "./Api's/ApiEndpoints";
+import { toast } from "react-toastify";
 
 const savePdf = (content, title) => {
     const doc = new jsPDF();
@@ -42,10 +42,15 @@ const downloadAtsPdf = async (body, pdfTitle) => {
         console.log("Sending request to generate ATS score via nodebackend service...");
         const res = await NodeBackendService(ApiEndpoints.generateATSScore, body, 'multipart/form-data');
         console.log(res.data);
-        savePdf(res.data.response, pdfTitle);
+        if (res?.data?.response) {
+            savePdf(res.data.response, pdfTitle);
+            toast.success('ATS report downloaded successfully.');
+        } else {
+            toast.error('Unable to generate ATS report.');
+        }
     } catch (error) {
-        alert("Something went wrong. Please try again later.");
-        console.error(error)
+        console.error(error);
+        toast.error('Something went wrong. Please try again later.');
     }
 }
 

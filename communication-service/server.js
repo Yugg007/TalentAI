@@ -1,41 +1,75 @@
+import dotenv from "dotenv";
 import express from 'express';
 import http from 'http';
-import { Server } from "socket.io";
-import cors from "cors";
+import { Server } from 'socket.io';
+import cors from 'cors';
 
-import registerSocketHandlers from "./socket/SocketManager.js";
-import { ConnectToMongo } from "./DbConfig/ConnectionConfig/DbConnection.js";
-import messageRoutes from "./Route/MessageRoute.js";
-import groupRoutes from "./Route/GroupRoute.js";
-import aiRoute from "./Route/AI-Route.js";
+import registerSocketHandlers from './socket/SocketManager.js';
+import { ConnectToMongo } from './DbConfig/ConnectionConfig/DbConnection.js';
+import messageRoutes from './Route/MessageRoute.js';
+import groupRoutes from './Route/GroupRoute.js';
+import aiRoute from './Route/AI-Route.js';
+
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+const PORT = Number(process.env.PORT) || 7007;
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:7001').split(',').map(origin => origin.trim());
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('CORS policy violation'));
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  },
 });
 
-// Register socket handlers
 registerSocketHandlers(io);
 
-// Middleware to parse JSON requests
 app.use(cors({
-  origin: 'http://localhost:9001', // your React app origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE','OPTIONS'],
-  credentials: true
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error('CORS policy violation'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
 }));
 app.use(express.json());
-app.use("/api/messages", messageRoutes);
-app.use("/api/groups", groupRoutes);
-app.use("/api/ai", aiRoute);
+app.use(express.urlencoded({ extended: true }));
 
-// Server listening to port 8000
-server.listen(9004, async () => {
-  await ConnectToMongo();
-  console.log("✅ MongoDB connected successfully");
-  console.log('🚀 Server is running on port 9004');
+app.use('/api/v1/comm/messages', messageRoutes);
+app.use('/api/v1/comm/groups', groupRoutes);
+app.use('/api/v1/comm/ai', aiRoute);
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
 });
+
+app.use((err, req, res, next) => {
+  console.error('Express error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+async function startServer() {
+  try {
+    await ConnectToMongo();
+    console.log('✅ MongoDB connected successfully');
+
+    server.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

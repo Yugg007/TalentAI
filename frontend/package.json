@@ -10,14 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@microlink/react-json-view": "^1.31.22",
     "axios": "^1.11.0",
     "jspdf": "^3.0.1",
+    "lucide-react": "^0.575.0",
     "peerjs": "^1.5.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.2",
-    "react-toastify": "^11.0.5",
+    "react-toastify": "^11.1.0",
     "simple-peer": "^9.11.1",
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.19",

@@ -21,7 +21,7 @@ router.post("/createGroup", async (req, res) => {
         if (existingGroup) {
             return res.status(400).json({ error: "Group already exists" });
         }
-        const newGroup = { groupName, members, admin, type: "group", timestamp: new Date() };
+        const newGroup = { groupName, members, admin, askToJoin: [], type: "group", timestamp: new Date() };
         await collection.insertOne(newGroup);
         res.status(201).json({ success: true, message: "Group created successfully" });
     } catch (error) {
@@ -32,10 +32,11 @@ router.post("/createGroup", async (req, res) => {
 
 router.post("/fetchGroupDetails", async (req, res) => {
     console.log("Fetching group details");
-    const username = req.body;
+    const { username } = req.body;
     try {
         const collection = await GetGroupDetailCollectionInstance();
-        const groups = await collection.find().toArray();
+        const filter = username ? { $or: [{ admin: username }, { members: username }] } : {};
+        const groups = await collection.find(filter).toArray();
         res.status(200).json(groups);
     } catch (error) {
         console.error("Error fetching group details:", error);
@@ -55,14 +56,12 @@ router.post("/checkMembership", async (req, res) => {
         const collection = await GetGroupDetailCollectionInstance();
         console.log("Checking membership for group:", groupName, "and user:", username);
         const group = await collection.findOne({ groupName: groupName });
+        if (!group) {
+            return res.status(404).json({ error: "Group not found" });
+        }
 
-        const member = group?.askToJoin?.includes(username);
-        if(member){
-            return res.status(200).json({ AskToJoin : true });
-        }
-        else{
-            return res.status(200).json({ AskToJoin : false });
-        }
+        const askToJoin = group?.askToJoin?.includes(username) || false;
+        return res.status(200).json({ askToJoin });
 
     } catch (error) {
         console.error("Error checking membership:", error);
@@ -80,17 +79,20 @@ router.post("/askToJoin", async (req, res) => {
 
     try {
         const collection = await GetGroupDetailCollectionInstance();
-        const existingRequest = await collection.findOne({ groupName: groupName });
+        const group = await collection.findOne({ groupName: groupName });
 
-        if (existingRequest) {
-            if (existingRequest.askToJoin?.includes(username)) {
-                return res.status(400).json({ error: "User already asked to join the group" });
-            }
-            await collection.updateOne(
-                { groupName: groupName },
-                { $push: { askToJoin: username } }
-            );
+        if (!group) {
+            return res.status(404).json({ error: "Group not found" });
         }
+
+        if (group.askToJoin?.includes(username)) {
+            return res.status(400).json({ error: "User already asked to join the group" });
+        }
+
+        await collection.updateOne(
+            { groupName: groupName },
+            { $push: { askToJoin: username } }
+        );
 
         res.status(201).json({ success: true, message: "Request sent successfully" });
     } catch (error) {
@@ -118,7 +120,7 @@ router.post("/updateAskToJoinStatus", async (req, res) => {
         if (action === "approve") {
             await collection.updateOne(
                 { groupName: groupName },
-                { $pull: { askToJoin: user }, $push: { members: user } }
+                { $pull: { askToJoin: user }, $addToSet: { members: user } }
             );
         } else if (action === "reject") {
             await collection.updateOne(
