@@ -71,4 +71,6 @@ Port Configuration.xlsx
 /Dummy/
 /storage/
 spring-core-backend/src/main/resources/
+**/src/main/resources/application-*.properties
+**/src/main/resources/application.properties
 
