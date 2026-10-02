@@ -70,5 +70,5 @@ Port Configuration.xlsx
 
 /Dummy/
 /storage/
-
+**/src/main/resources/application-*.properties
 
