@@ -1,6 +1,7 @@
 package com.talent.ai.core.dto;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,6 +23,8 @@ public class ATSTask {
 	// Status for your Scheduler: PENDING, PROCESSING, COMPLETED
 	private String status;
 	private String content; // The AI's final response
+	private Map<String, Object> result;
+	private String error;
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	public String getId() {
@@ -79,6 +82,22 @@ public class ATSTask {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public Map<String, Object> getResult() {
+		return result;
+	}
+
+	public void setResult(Map<String, Object> result) {
+		this.result = result;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 
 	public LocalDateTime getCreatedAt() {

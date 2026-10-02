@@ -1,10 +1,14 @@
 package com.talent.ai.core.dto;
 
+import java.util.Map;
+
 public class ATSTaskResponse {
 	private String taskId;
 	private String content;
 	private String message;
 	private String status;
+	private Map<String, Object> result;
+	private String error;
 
 	public ATSTaskResponse(String taskId, String content, String message, String status) {
 		super();
@@ -48,6 +52,22 @@ public class ATSTaskResponse {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Map<String, Object> getResult() {
+		return result;
+	}
+
+	public void setResult(Map<String, Object> result) {
+		this.result = result;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 	
 	

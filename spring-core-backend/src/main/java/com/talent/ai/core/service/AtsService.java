@@ -1,17 +1,13 @@
 package com.talent.ai.core.service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.bson.Document;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.talent.ai.core.dto.ATSTask;
 import com.talent.ai.core.dto.ATSTaskResponse;
@@ -20,12 +16,10 @@ import com.talent.ai.core.repository.AtsRepository;
 @Service
 public class AtsService {
 
-    @Autowired
-    private AtsRepository repository;
-    private final MongoTemplate mongoTemplate;
-    
-    public AtsService(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
+    private final AtsRepository repository;
+
+    public AtsService(AtsRepository repository) {
+        this.repository = repository;
     }
     
     public String parsePdf(MultipartFile file) throws IOException {
@@ -62,8 +56,10 @@ public class AtsService {
         } else if ("COMPLETED".equals(atsTask.getStatus())) {
             response.setMessage("Using cached result");
             response.setContent(atsTask.getContent());
+            response.setResult(atsTask.getResult());
         } else if ("FAILED".equals(atsTask.getStatus())) {
             response.setMessage("Previous request failed");
+            response.setError(atsTask.getError());
         }
 
         return Optional.of(response);
@@ -80,37 +76,18 @@ public class AtsService {
         return Optional.of(response);
     }
 
-	public Object getTaskSummary(String taskId) {
-		// TODO Auto-generated method stub
-		
-		try {
-			Object obj = mongoTemplate.findById(
-					taskId,
-			        Document.class,
-			        "ats_task"
-			);
-			System.out.print(obj);
-			return obj;
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-		
-		
-//		Optional<ATSTask> optionalTask = repository.findById(taskId);
-//		if (optionalTask.isEmpty()) {
-//            return null;
-//        }
-//		
-//		ATSTask task = optionalTask.get();
-//		
-//		return new ATSTaskResponse(
-//                task.getId(),
-//                task.getContent(),
-//                "",
-//                task.getStatus()
-//        );
+    public ATSTaskResponse getTaskSummary(String taskId, String username) {
+        return repository.findById(taskId)
+                .filter(task -> username != null && username.equals(task.getUsername()))
+                .map(task -> {
+                    ATSTaskResponse response = new ATSTaskResponse();
+                    response.setTaskId(task.getId());
+                    response.setStatus(task.getStatus());
+                    response.setResult(task.getResult());
+                    response.setContent(task.getContent());
+                    response.setError(task.getError());
+                    return response;
+                })
+                .orElse(null);
 	}
 }

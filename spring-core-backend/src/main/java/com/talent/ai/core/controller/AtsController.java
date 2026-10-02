@@ -4,8 +4,10 @@ import java.util.Optional;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,19 +29,34 @@ public class AtsController {
     public ResponseEntity<ATSTaskResponse> generateScore(
         @RequestParam("pdf") MultipartFile file,
         @RequestParam("jobDescription") String jdText,
-        @RequestParam("username") String username
-    ) throws Exception {
+        @AuthenticationPrincipal UserDetails authenticatedUser
+    ) {
+        if (file == null || file.isEmpty()) {
+            return badRequest("Choose a PDF resume to continue.");
+        }
+        if (file.getSize() > 10 * 1024 * 1024) {
+            return badRequest("The resume must be 10 MB or smaller.");
+        }
+        if (jdText == null || jdText.isBlank()) {
+            return badRequest("Add a job description or role requirements to continue.");
+        }
+        if (authenticatedUser == null || authenticatedUser.getUsername().isBlank()) {
+            return badRequest("Sign in before starting a resume fit review.");
+        }
+        String username = authenticatedUser.getUsername();
+
     	Optional<ATSTaskResponse> response;
         
         // 1. Extract Text from PDF (Replaces extractTextFromPdf)
     	String resumeText = "";
-    	try {
+        try {
     		resumeText = atsService.parsePdf(file);
 		} catch (Exception e) {
-			// TODO: handle exception
+            return badRequest("We couldn’t read that PDF. Try a text-based PDF resume.");
 		}
-    	
-    	if(resumeText.isEmpty()) throw new Exception("Resume is blank, Please reupload resume...");
+        if (resumeText.isBlank()) {
+            return badRequest("No readable text was found in the resume. Try a text-based PDF.");
+        }
         
         
     	String normalizedResume =
@@ -62,19 +79,29 @@ public class AtsController {
             return ResponseEntity.ok(response.get());
         }
 
-        // 4. Send to AI Worker (Via Kafka/HTTP)
-        // We "drop work" here as per your diagram
+        // The AI scheduler picks up the persisted PENDING task from MongoDB.
         response = atsService.requestAiAnalysis(username, resumeText, jdText, requestHash);
 
         return ResponseEntity.accepted().body(response.get());
     }
+
+    private ResponseEntity<ATSTaskResponse> badRequest(String message) {
+        ATSTaskResponse response = new ATSTaskResponse();
+        response.setMessage(message);
+        response.setError(message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
     
     @PostMapping("/summary/{taskId}")
-    public ResponseEntity<Object> getSummary(
-            @PathVariable String taskId) {
-
-        return ResponseEntity.ok(
-                atsService.getTaskSummary(taskId)
-        );
+    public ResponseEntity<ATSTaskResponse> getSummary(
+            @PathVariable String taskId,
+            @AuthenticationPrincipal UserDetails authenticatedUser) {
+        ATSTaskResponse response = authenticatedUser == null
+                ? null
+                : atsService.getTaskSummary(taskId, authenticatedUser.getUsername());
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(response);
     }
 }
