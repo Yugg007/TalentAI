@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './style.css';
 
 import { BackendService } from '../../Utils/Api\'s/ApiMiddleWare';
 import ApiEndpoints from '../../Utils/Api\'s/ApiEndpoints';
-import demoImage from '../../assets/google.png';
 import CountdownRedirect from '../Model/CountdownRedirect';
 import { downloadAtsPdf } from '../../Utils/DownloadAtsPdf';
+import { trackRole } from '../../Utils/ApplicationsStore';
+import { useAuth } from '../../context/AuthContext';
 
 const Job = () => {
   const { id } = useParams();
@@ -15,9 +16,11 @@ const Job = () => {
 };
 
 function JobDetail({ jobId }) {
+  const { user } = useAuth();
   const [job, setJob] = useState(null);
   const [file, setFile] = useState(null);
   const [jobFetchFailed, setJobFetchFailed] = useState(false);
+  const [isTracked, setIsTracked] = useState(false);
 
   const skills = job?.skills?.split(',').map((skill) => skill.trim()).filter(Boolean) || [];
   const hasMatchScore = job?.matchScore !== undefined && job?.matchScore !== null && job?.matchScore !== '';
@@ -56,6 +59,12 @@ function JobDetail({ jobId }) {
     }
   };
 
+  const handleTrackRole = () => {
+    const result = trackRole(job, user?.username || user?.userId);
+    setIsTracked(true);
+    toast.success(result.created ? 'Role added to your application tracker.' : 'This role is already in your tracker.');
+  };
+
   const fetchJobDetails = async () => {
     try {
       const body = { id: jobId };
@@ -89,7 +98,9 @@ function JobDetail({ jobId }) {
           <div className="job-detail-grid">
             <section className="job-card-panel">
               <div className="job-card-header">
-                <img src={demoImage} alt="Company Logo" className="job-logo" />
+                <span className="job-company-mark" aria-hidden="true">
+                  {(job?.company || job?.companyName || 'T').charAt(0).toUpperCase()}
+                </span>
                 <div className="job-header-copy">
                   <span className="job-badge-pill">Role brief</span>
                   <h1 className="job-title">{job?.title}</h1>
@@ -153,7 +164,14 @@ function JobDetail({ jobId }) {
                 <label htmlFor="resumeUpload" className="file-label">Upload your resume</label>
                 <input id="resumeUpload" type="file" className="file-input" accept="application/pdf" onChange={handleFileChange} />
                 <button className="apply-btn" onClick={checkAtsScore}>Download ATS Report</button>
-                <button className="apply-btn secondary" onClick={() => toast.info('Apply link will be added soon.')}>Save & Apply later</button>
+                <button className="apply-btn secondary" onClick={handleTrackRole} disabled={isTracked}>
+                  {isTracked ? 'Added to tracker' : 'Track this role'}
+                </button>
+                {isTracked && (
+                  <Link className="tracker-follow-link" to="/applications">
+                    Open application tracker <ArrowRight size={15} aria-hidden="true" />
+                  </Link>
+                )}
               </div>
             </aside>
           </div>

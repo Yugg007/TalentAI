@@ -1,0 +1,478 @@
+.applications-page {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+  color: var(--ink);
+}
+
+.applications-heading,
+.tracker-list-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.applications-heading h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.applications-subtitle {
+  max-width: 600px;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.tracker-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #e7dcae;
+  border-radius: 6px;
+  background: #fbf7e9;
+  color: #665728;
+}
+
+.tracker-notice-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #bd9839;
+}
+
+.tracker-notice p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.tracker-metrics {
+  display: grid;
+  grid-template-columns: 150px 150px 150px minmax(0, 1fr);
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.tracker-metric,
+.tracker-progress-copy {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  min-height: 94px;
+  padding: 15px 20px;
+  border-right: 1px solid var(--line);
+}
+
+.tracker-metric span,
+.tracker-progress-copy > span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.tracker-metric strong {
+  color: var(--forest);
+  font-family: 'Manrope', sans-serif;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.tracker-progress-copy {
+  border-right: 0;
+}
+
+.tracker-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.tracker-flow-step {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex: 1;
+}
+
+.tracker-flow-step i {
+  width: 100%;
+  height: 1px;
+  margin: 0 8px;
+  background: var(--line-strong);
+}
+
+.tracker-flow-step b {
+  order: 1;
+  color: var(--muted-soft);
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tracker-flow-step:first-child b {
+  color: var(--forest);
+}
+
+.tracker-list-section {
+  display: grid;
+  gap: 16px;
+}
+
+.tracker-list-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 20px;
+}
+
+.tracker-list-heading .section-overline {
+  margin-bottom: 6px;
+}
+
+.tracker-total {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.tracker-filters {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  scrollbar-width: thin;
+}
+
+.tracker-filter {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.tracker-filter:hover {
+  background: #e9eee7;
+  color: var(--forest);
+}
+
+.tracker-filter.is-active {
+  border-color: var(--line);
+  background: #fff;
+  color: var(--forest);
+}
+
+.tracker-filter span {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 4px;
+  background: #edf1e9;
+  font-size: 9px;
+}
+
+.application-list {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.application-row {
+  display: grid;
+  min-height: 92px;
+  grid-template-columns: 42px minmax(150px, 1.3fr) minmax(130px, 0.8fr) 58px auto 18px;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 17px;
+  border-bottom: 1px solid var(--line);
+}
+
+.application-row:last-child {
+  border-bottom: 0;
+}
+
+.application-company-mark {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 8px;
+  background: #e3eedc;
+  color: var(--forest);
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.application-role-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.application-role-title {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.application-role-title:hover {
+  color: var(--forest);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.application-role-copy span,
+.application-role-copy small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.application-role-copy small {
+  color: var(--muted-soft);
+}
+
+.application-stage-wrap {
+  display: grid;
+  gap: 4px;
+}
+
+.application-stage-wrap label {
+  color: var(--muted-soft);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.application-stage-wrap select {
+  width: 100%;
+  min-height: 31px;
+  padding: 0 24px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #f8f9f6;
+  color: var(--forest);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.application-stage-wrap small {
+  color: var(--muted-soft);
+  font-size: 9px;
+}
+
+.application-step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.step-dot.is-complete {
+  background: #7d9d54;
+}
+
+.application-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.application-actions a,
+.application-actions button {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.application-actions a:hover,
+.application-actions button:hover {
+  background: #edf1e9;
+  color: var(--forest);
+}
+
+.application-actions button:hover {
+  background: #f8e8e2;
+  color: var(--coral);
+}
+
+.application-row-more {
+  display: none;
+  color: var(--muted-soft);
+}
+
+.tracker-empty-state {
+  display: grid;
+  min-height: 250px;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 28px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: center;
+}
+
+.tracker-empty-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 10px;
+  background: #e3eedc;
+  color: var(--forest);
+}
+
+.tracker-empty-state h3 {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+}
+
+.tracker-empty-state p {
+  max-width: 360px;
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.tracker-empty-state .button-primary {
+  min-height: 37px;
+  font-size: 10px;
+}
+
+@media (max-width: 1050px) {
+  .tracker-metrics {
+    grid-template-columns: repeat(3, minmax(90px, 0.6fr)) minmax(270px, 1.8fr);
+  }
+
+  .application-row {
+    grid-template-columns: 42px minmax(130px, 1fr) minmax(125px, 0.8fr) auto 18px;
+  }
+
+  .application-step-indicator {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .applications-page {
+    gap: 18px;
+  }
+
+  .applications-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .applications-heading h1 {
+    font-size: 26px;
+  }
+
+  .tracker-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tracker-metric {
+    min-height: 76px;
+    padding: 12px;
+  }
+
+  .tracker-metric strong {
+    font-size: 23px;
+  }
+
+  .tracker-progress-copy {
+    grid-column: 1 / -1;
+    min-height: 75px;
+    border-top: 1px solid var(--line);
+  }
+
+  .tracker-flow-step b {
+    font-size: 8px;
+  }
+
+  .tracker-flow-step i {
+    margin: 0 4px;
+  }
+
+  .tracker-list-heading {
+    align-items: flex-end;
+  }
+
+  .application-row {
+    grid-template-columns: 36px minmax(0, 1fr) 18px;
+    gap: 10px;
+    padding: 13px 11px;
+  }
+
+  .application-company-mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .application-stage-wrap {
+    grid-column: 2 / 3;
+  }
+
+  .application-stage-wrap label,
+  .application-stage-wrap small {
+    display: none;
+  }
+
+  .application-stage-wrap select {
+    max-width: 165px;
+  }
+
+  .application-actions {
+    grid-column: 2 / 4;
+    justify-content: flex-start;
+    margin-top: 1px;
+  }
+
+  .application-row-more {
+    display: block;
+    grid-column: 3;
+    grid-row: 1;
+  }
+}

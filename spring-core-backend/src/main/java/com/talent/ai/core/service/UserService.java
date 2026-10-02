@@ -1,5 +1,7 @@
 package com.talent.ai.core.service;
 
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,26 +31,31 @@ public class UserService {
 	private FileStorageService fileStorageService;
 
 	public UserDTO register(AuthUserDto dto) throws Exception {
-	    if (dto == null || dto.getUsername() == null || dto.getUsername().trim().isEmpty()) {
+        if (dto == null || isBlank(dto.getUsername()) || isBlank(dto.getEmail()) || isBlank(dto.getPassword())) {
 	        throw new Exception("Invalid user data.");
 	    }
 
+        String username = dto.getUsername().trim();
+        String email = dto.getEmail().trim().toLowerCase(Locale.ROOT);
+        String role = normalizeRole(dto.getRole());
+
 	    // Check if user already exists
-	    if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-	        throw new Exception("User already exists with username: " + dto.getUsername());
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new Exception("User already exists with username: " + username);
 	    }
-	    if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-	        throw new Exception("User already exists with email: " + dto.getEmail());
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new Exception("User already exists with email: " + email);
 	    }
 
         User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
+        user.setUsername(username);
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole(role);
         userRepository.save(user);
 
         PersonInfo personInfo = new PersonInfo();
-        personInfo.setFirstName(dto.getFirstName());
+        personInfo.setFirstName(dto.getFirstName() == null ? null : dto.getFirstName().trim());
         personInfo.setDescription(dto.getDescription());
 
         // Set bidirectional relationship
@@ -60,7 +67,10 @@ public class UserService {
 	}
 	
 	public UserDTO login(AuthUserDto dto) throws Exception {
-		User dbUser = masterData.loadUserViaUserEmail(dto.getEmail());
+        if (dto == null || isBlank(dto.getEmail()) || isBlank(dto.getPassword())) {
+            throw new Exception("Email and password are required.");
+        }
+        User dbUser = masterData.loadUserViaUserEmail(dto.getEmail().trim());
 		if(dbUser == null) {
 			throw new Exception("User not found.");
 		}
@@ -71,6 +81,18 @@ public class UserService {
 		
 		return UserDTO.fromEntity(dbUser);
 	}
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private String normalizeRole(String role) throws Exception {
+        String normalizedRole = isBlank(role) ? "candidate" : role.trim().toLowerCase(Locale.ROOT);
+        if (!"candidate".equals(normalizedRole) && !"recruiter".equals(normalizedRole)) {
+            throw new Exception("Account type must be candidate or recruiter.");
+        }
+        return normalizedRole;
+    }
 
     public UserDTO updateUserProfile(UserDTO userDTO) throws Exception {
         User user = masterData.loadUserViaUserName(userDTO.getUsername());
@@ -93,6 +115,15 @@ public class UserService {
 
         if(userDTO.getFirstName() != null) {
         	personInfo.setFirstName(userDTO.getFirstName());        	
+        }
+        if (userDTO.getCompanyName() != null) {
+            personInfo.setCompanyName(userDTO.getCompanyName());
+        }
+        if (userDTO.getJobTitle() != null) {
+            personInfo.setJobTitle(userDTO.getJobTitle());
+        }
+        if (userDTO.getHiringFocus() != null) {
+            personInfo.setHiringFocus(userDTO.getHiringFocus());
         }
         if(userDTO.getSkills() != null) {
         	personInfo.setSkills(userDTO.getSkills());

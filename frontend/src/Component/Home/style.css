@@ -663,6 +663,123 @@
   white-space: nowrap;
 }
 
+.journey-section {
+  display: grid;
+  gap: 13px;
+}
+
+.journey-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.journey-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+}
+
+.journey-heading .section-overline {
+  margin-bottom: 5px;
+}
+
+.journey-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  color: var(--forest);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.journey-count > span {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border-radius: 5px;
+  background: #e3eedc;
+}
+
+.journey-rail {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.journey-step {
+  position: relative;
+  display: grid;
+  min-height: 58px;
+  grid-template-columns: 22px minmax(0, 1fr) 13px;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 10px;
+  border-right: 1px solid var(--line);
+  color: var(--ink);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.journey-step:last-child {
+  border-right: 0;
+}
+
+.journey-step:not(.is-planned):hover {
+  background: #edf2e9;
+  color: var(--forest);
+}
+
+.journey-index {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eef1eb;
+  color: var(--forest);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.journey-stage {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.journey-step > svg {
+  color: var(--muted-soft);
+}
+
+.journey-step.is-planned {
+  grid-template-columns: 22px minmax(0, 1fr);
+  background: #f6f7f4;
+  color: #87918a;
+  cursor: default;
+}
+
+.journey-planned-label {
+  grid-column: 2;
+  margin-top: -7px;
+  color: #a0a9a2;
+  font-size: 8px;
+}
+
+.journey-note {
+  margin: -5px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
 .action-section,
 .roles-section {
   display: grid;
@@ -1011,6 +1128,28 @@
     align-items: stretch;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .journey-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .journey-heading h2 {
+    font-size: 16px;
+  }
+
+  .journey-rail {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .journey-step {
+    min-width: 125px;
+    min-height: 54px;
+    flex: 0 0 125px;
   }
 
   .search-field {

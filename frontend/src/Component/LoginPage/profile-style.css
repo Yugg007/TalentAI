@@ -11,6 +11,58 @@
   box-sizing: border-box;
 }
 
+.profile-card-recruiter {
+  border-top: 4px solid #087f72;
+}
+
+.profile-card-recruiter .profile-avatar {
+  background: linear-gradient(135deg, #087f72 0%, #18a58e 100%);
+  box-shadow: 0 10px 20px -5px rgba(8, 127, 114, 0.28);
+}
+
+.profile-card-recruiter .profile-role,
+.profile-card-recruiter .resume-link {
+  color: #087f72;
+}
+
+.profile-card-recruiter .completion-ring {
+  background: conic-gradient(#087f72 calc(var(--pct, 0) * 1%), #e7efec 0);
+}
+
+.profile-card-recruiter .profile-input:focus,
+.profile-card-recruiter .profile-textarea:focus {
+  border-color: #087f72;
+  box-shadow: 0 0 0 3px rgba(8, 127, 114, 0.12);
+}
+
+.recruiter-focus-block {
+  grid-column: 1 / -1;
+}
+
+.recruiter-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.recruiter-profile-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0.65rem 1rem;
+  border: 1px solid #a7d8cf;
+  border-radius: 8px;
+  background: #effaf7;
+  color: #08685e;
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.recruiter-profile-actions a:hover {
+  background: #dff4ef;
+}
+
 /* Header & Avatar */
 .profile-header {
   display: flex;

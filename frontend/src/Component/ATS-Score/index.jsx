@@ -1,35 +1,30 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Loader2, Upload, Plus, X, CheckCircle2 } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Loader2, Upload, CheckCircle2 } from "lucide-react";
 import "./style.css";
 import { BackendService } from "../../Utils/Api's/ApiMiddleWare";
 import { useAuth } from "../../context/AuthContext";
 import { v4 as uuidv4 } from "uuid";
 import JsonViewer from "./JsonViewer"; // Import the JsonViewer component
-
-// Reusable keyword tag component
-const KeywordTag = ({ word, onRemove }) => (
-  <span className="keyword-tag">
-    {word}
-    <button type="button" onClick={() => onRemove(word)}>
-      <X size={14} />
-    </button>
-  </span>
-);
+import { useLocation } from "react-router-dom";
 
 const ATSScore = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const linkedRole = location.state?.role;
   const username = user?.username;
   const [pdfFile, setPdfFile] = useState(null);
-  const [keywordsList, setKeywordsList] = useState([]);
-  const [keyword, setKeyword] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [taskId, setTaskId] = useState(null);
-  const [analysisResult, setAnalysisResult] = useState(null);
   const [result, setResult] = useState(null);
-  const [prompt, setPrompt] = useState(
-    "",
-    // "I have provided a List of skills / keywords and a resume. Based on these, please provide an ATS score. Also, provide suggestions to improve my resume so that I can be the best fit for these skills. Be very specific.",
-  );
+  const [prompt, setPrompt] = useState(() => {
+    if (!linkedRole) return "";
+
+    return [
+      `Role: ${linkedRole.title}`,
+      linkedRole.company ? `Company: ${linkedRole.company}` : "",
+      linkedRole.jobDescription ? `Job description:\n${linkedRole.jobDescription}` : "",
+      linkedRole.skills ? `Required skills: ${linkedRole.skills}` : "",
+    ].filter(Boolean).join("\n\n");
+  });
 
   const idempotencyKeyRef = useRef(null);
   const activeTaskIdRef = useRef(null);
@@ -44,18 +39,6 @@ const ATSScore = () => {
     }
   };
 
-  const handleAddKeyword = () => {
-    const trimmed = keyword.trim();
-    if (trimmed && !keywordsList.includes(trimmed)) {
-      setKeywordsList([...keywordsList, trimmed]);
-      setKeyword("");
-    }
-  };
-
-  const handleRemoveKeyword = (wordToRemove) => {
-    setKeywordsList(keywordsList.filter((word) => word !== wordToRemove));
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -66,7 +49,7 @@ const ATSScore = () => {
       return alert("Please provide a job description or skills/keywords.");
     }
 
-    setAnalysisResult(null); // Reset previous results
+    setResult(null);
     const newKey = uuidv4();
     idempotencyKeyRef.current = newKey;
     localStorage.setItem("active_idempotency_key", newKey);
@@ -74,7 +57,6 @@ const ATSScore = () => {
     try {
       const formData = new FormData();
       formData.append("pdf", pdfFile);
-      // formData.append("jobDescription", keywordsList.join(", "));
       formData.append("jobDescription", prompt);
       formData.append("username", username);
 
@@ -86,7 +68,6 @@ const ATSScore = () => {
 
       if (response.data) {
         setIsAnalyzing(true);
-        setTaskId(response.data.taskId);
         const { taskId } = response.data;
         activeTaskIdRef.current = taskId;
         localStorage.setItem("active_task_id", taskId);
@@ -101,7 +82,7 @@ const ATSScore = () => {
     }
   };
 
-  const pollTaskStatus = async (taskId) => {
+  const pollTaskStatus = useCallback(async (taskId) => {
     try {
       const response = await BackendService("/ats/summary/" + taskId);
 
@@ -125,11 +106,11 @@ const ATSScore = () => {
       //   // Still running, queue next poll
       //   pollTimerRef.current = setTimeout(() => pollTaskStatus(taskId), 5000);
       // }
-    } catch (err) {
+    } catch {
       // Network hiccup? Keep polling anyway.
       pollTimerRef.current = setTimeout(() => pollTaskStatus(taskId), 5000);
     }
-  };
+  }, []);
 
   const clearStorage = () => {
     idempotencyKeyRef.current = null;
@@ -156,12 +137,17 @@ const ATSScore = () => {
     return () => {
       if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
     };
-  }, []);
+  }, [pollTaskStatus]);
 
   return (
     <div className="ats-container">
       <div className="ats-card">
-        <h2 className="ats-title">TalentAI ATS Analyzer</h2>
+        <h1 className="ats-title">Resume fit review</h1>
+        <p className="ats-intro">
+          {linkedRole
+            ? `Compare your experience with ${linkedRole.title}${linkedRole.company ? ` at ${linkedRole.company}` : ''}.`
+            : "Compare your experience with a job description and identify what to strengthen."}
+        </p>
 
         <form onSubmit={handleSubmit} id="ats-form">
           <div className="form-section">
@@ -179,42 +165,6 @@ const ATSScore = () => {
               </span>
             </div>
           </div>
-
-          {/* <div className="form-section">
-            <label className="section-label">Target Skills & Keywords</label>
-            <div className="keyword-input-box">
-              <input
-                type="text"
-                placeholder="e.g. React, Java, Spring Boot"
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                className="text-input"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddKeyword();
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={handleAddKeyword}
-                className="add-button"
-              >
-                <Plus size={18} /> Add
-              </button>
-            </div>
-
-            <div className="keywords-list">
-              {keywordsList.map((word, index) => (
-                <KeywordTag
-                  key={index}
-                  word={word}
-                  onRemove={handleRemoveKeyword}
-                />
-              ))}
-            </div>
-          </div> */}
 
           <div className="form-section">
             <label className="section-label">Job Description</label>
@@ -234,8 +184,7 @@ const ATSScore = () => {
           >
             {isAnalyzing ? (
               <>
-                <Loader2 className="spinner" size={20} /> Analyzing with Llama
-                3.1...
+                <Loader2 className="spinner" size={20} /> Comparing your resume with the role...
               </>
             ) : (
               "Generate ATS Score"

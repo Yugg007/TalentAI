@@ -1,8 +1,10 @@
 package com.talent.ai.core.config;
 
 import java.util.List;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,6 +24,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SpringSecurity {
 	@Autowired
 	private JwtAuthorizationFilter jwtAuthorizationFilter;
+
+    @Value("${app.cors.allowed-origins:http://localhost:7001}")
+    private String allowedOrigins;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
@@ -48,7 +53,10 @@ public class SpringSecurity {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Allow your React frontend
-        configuration.setAllowedOrigins(List.of("http://localhost:3001", "http://localhost:7001")); 
+        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList());
 
         // Allow methods
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

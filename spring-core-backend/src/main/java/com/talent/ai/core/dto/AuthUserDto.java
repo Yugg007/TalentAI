@@ -6,6 +6,7 @@ public class AuthUserDto {
     private String password;
     private String firstName;
     private String description;
+	private String role;
     
 	public String getUsername() {
 		return username;
@@ -36,6 +37,12 @@ public class AuthUserDto {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 }

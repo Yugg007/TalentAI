@@ -64,7 +64,7 @@ public class UserController {
 		HttpHeaders headers = new HttpHeaders();
 		try {
 			UserDTO userDto = userService.register(dto);
-        	String cookieValue = CookieUtil.buildCookieHeader("talentAiToken", AesUtil.encrypt(jwtUtil.generateToken(dto.getUsername())), 36000, true);
+	        String cookieValue = CookieUtil.buildCookieHeader("talentAiToken", AesUtil.encrypt(jwtUtil.generateToken(userDto.getUsername())), 36000, true);
         	headers.add(HttpHeaders.SET_COOKIE, cookieValue);
 			return ResponseEntity.ok().headers(headers).body(userDto);
 		} catch (Exception e) {
@@ -74,7 +74,7 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<UserDTO> login(@RequestBody AuthUserDto authDto, HttpServletResponse res){
+	public ResponseEntity<Object> login(@RequestBody AuthUserDto authDto, HttpServletResponse res){
 		HttpHeaders headers = new HttpHeaders();
 		UserDTO dto = null;
 		try {
@@ -83,8 +83,7 @@ public class UserController {
         	headers.add(HttpHeaders.SET_COOKIE, cookieValue);
 			return ResponseEntity.ok().headers(headers).body(dto);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(400).body(dto);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
 		}
 	}
 	
@@ -96,7 +95,7 @@ public class UserController {
 			UserDTO dto = UserDTO.fromEntity(masterData.loadUserViaUserName(username));
 			return ResponseEntity.status(200).body(dto);
 		} catch (Exception e) {
-			return ResponseEntity.status(400).headers(headers).body(null);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(headers).body(null);
 		}
 	}
 	

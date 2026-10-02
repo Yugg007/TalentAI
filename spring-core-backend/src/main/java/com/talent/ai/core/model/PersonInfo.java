@@ -11,6 +11,9 @@ public class PersonInfo {
 	private Long userId;
 
 	private String firstName;
+	private String companyName;
+	private String jobTitle;
+	private String hiringFocus;
 	private String skills;
 	private String education;
 	@Column(name = "description", length = 4000)
@@ -39,6 +42,30 @@ public class PersonInfo {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getJobTitle() {
+		return jobTitle;
+	}
+
+	public void setJobTitle(String jobTitle) {
+		this.jobTitle = jobTitle;
+	}
+
+	public String getHiringFocus() {
+		return hiringFocus;
+	}
+
+	public void setHiringFocus(String hiringFocus) {
+		this.hiringFocus = hiringFocus;
 	}
 
 	public String getSkills() {

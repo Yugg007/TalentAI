@@ -50,7 +50,7 @@ public class MasterData {
 	
 	public User loadUserViaUserEmail(String email) {
 		for(User user : users) {
-			if(user.getEmail().equals(email)) {
+			if(user.getEmail() != null && user.getEmail().equalsIgnoreCase(email.trim())) {
 				return user;
 			}
 		}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FaUser, FaEnvelope, FaArrowRight, FaIdBadge } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { toast } from "react-toastify";
@@ -9,54 +9,69 @@ import ProfileSection from "./ProfileSection";
 import { useAuth } from '../../context/AuthContext';
 
 const LoginPage = () => {
-  const { isLoggedIn, setIsLoggedIn, user, setUser, authStatus } = useAuth();
+  const { isLoggedIn, isAuthLoading, setIsLoggedIn, user, setUser } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState("candidate");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      toast.error("Email and password are required.");
+    setFormError("");
+
+    if (!email.trim() || !password) {
+      setFormError("Email and password are required.");
       return;
     }
 
-    if (!isLogin && !username.trim()) {
-      toast.error("Please choose a username.");
+    if (!isLogin && (!username.trim() || !name.trim())) {
+      setFormError("Add your name and choose a username to create an account.");
       return;
     }
 
     const userPayload = isLogin
-      ? { email, password }
-      : { username, email, password, firstName: name, role };
+      ? { email: email.trim().toLowerCase(), password }
+      : {
+          username: username.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+          firstName: name.trim(),
+          role,
+        };
 
+    setIsSubmitting(true);
     try {
       const response = await BackendService(
         isLogin ? ApiEndpoints.login : ApiEndpoints.register,
         userPayload
       );
 
-      if (response?.data) {
+      if (response?.data?.username) {
         setUser(response.data);
         setIsLoggedIn(true);
         toast.success(isLogin ? "Welcome back!" : "Account created successfully.");
       } else {
-        toast.error("Login/Register failed. Please check your credentials.");
+        setFormError("We couldn’t verify those details. Check them and try again.");
       }
-    } catch (err) {
-      console.error("Login/Register Error:", err);
-      toast.error("Something went wrong. Please try again.");
+    } catch (error) {
+      console.error("Login/Register Error:", error);
+      const responseMessage = error.response?.data;
+      const message = typeof responseMessage === "string" && responseMessage.trim()
+        ? responseMessage
+        : "We couldn’t verify those details. Check them and try again.";
+      setFormError(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    if (!user) {
-      authStatus();
-    }
-  }, [user]);
+  if (isAuthLoading) {
+    return <div className="auth-loading" role="status">Checking your session…</div>;
+  }
 
   return (
     <>
@@ -88,6 +103,7 @@ const LoginPage = () => {
                 placeholder="Email"
                 aria-label="Email"
                 autoComplete="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -101,6 +117,7 @@ const LoginPage = () => {
                   placeholder="Username"
                   aria-label="Username"
                   autoComplete="username"
+                  required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -115,6 +132,7 @@ const LoginPage = () => {
                   placeholder="Full Name"
                   aria-label="Full name"
                   autoComplete="name"
+                  required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -156,18 +174,22 @@ const LoginPage = () => {
                 placeholder="Password"
                 aria-label="Password"
                 autoComplete={isLogin ? "current-password" : "new-password"}
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            <button type="submit" className="btn-primary">
-              {isLogin ? "Login" : "Register"} <FaArrowRight />
+            {formError && <p className="auth-error" role="alert">{formError}</p>}
+
+            <button type="submit" className="btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? (isLogin ? "Signing in…" : "Creating account…") : (isLogin ? "Sign in" : "Create account")}
+              {!isSubmitting && <FaArrowRight />}
             </button>
             </form>
 
             <p className="toggle-text">
-              {isLogin ? "Don't have an account?" : "Already a user?"} <button type="button" className="auth-toggle" onClick={() => setIsLogin(!isLogin)}>
+              {isLogin ? "Don't have an account?" : "Already a user?"} <button type="button" className="auth-toggle" disabled={isSubmitting} onClick={() => { setFormError(""); setIsLogin(!isLogin); }}>
                 {isLogin ? "Sign Up" : "Login"}
               </button>
             </p>

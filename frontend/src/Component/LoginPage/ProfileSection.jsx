@@ -19,12 +19,16 @@ const ProfileSection = ({ user, setUser }) => {
     skills: user?.skills || "",
     education: user?.education || "",
     description: user?.description || "",
+    companyName: user?.companyName || "",
+    jobTitle: user?.jobTitle || "",
+    hiringFocus: user?.hiringFocus || "",
   });
 
   const [skillInput, setSkillInput] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const isRecruiter = user?.role?.toLowerCase() === "recruiter";
 
   // Snapshot taken when edit mode opens, used to know if there's
   // anything worth saving and to warn before discarding changes.
@@ -203,6 +207,9 @@ const ProfileSection = ({ user, setUser }) => {
         skills: user.skills || "",
         education: user.education || "",
         description: user.description || "",
+        companyName: user.companyName || "",
+        jobTitle: user.jobTitle || "",
+        hiringFocus: user.hiringFocus || "",
       });
     }
   }, [user]);
@@ -236,10 +243,10 @@ const ProfileSection = ({ user, setUser }) => {
 
   const completionFields = [
     formData.firstName,
-    formData.skills,
-    formData.education,
     formData.description,
-    existingResumeUrl || resumeFile,
+    ...(isRecruiter
+      ? [formData.companyName, formData.jobTitle, formData.hiringFocus]
+      : [formData.skills, formData.education, existingResumeUrl || resumeFile]),
   ];
   const profileCompletion = Math.round(
     (completionFields.filter(Boolean).length / completionFields.length) * 100
@@ -283,16 +290,20 @@ const ProfileSection = ({ user, setUser }) => {
 };
 
   return (
-    <div className="profile-card">
+    <div className={`profile-card${isRecruiter ? " profile-card-recruiter" : ""}`}>
       <div className="profile-header">
         <div className="profile-avatar">{initials}</div>
 
         <div className="profile-heading">
           <div className="profile-heading-row">
             <h2 className="profile-name">{user?.firstName || user?.username}</h2>
-            <span className="profile-status">Open to work</span>
+            <span className="profile-status">
+              {isRecruiter ? "Hiring workspace" : "Open to work"}
+            </span>
           </div>
-          <p className="profile-role">Candidate profile</p>
+          <p className="profile-role">
+            {isRecruiter ? "Recruiter profile" : "Candidate profile"}
+          </p>
           <p className="profile-email">{user?.email}</p>
         </div>
 
@@ -310,11 +321,23 @@ const ProfileSection = ({ user, setUser }) => {
       </div>
 
       <div className="profile-stat-line">
-        <span>{skillList.length} skill{skillList.length === 1 ? "" : "s"}</span>
-        <span className="stat-divider" />
-        <span>Education {formData.education ? "added" : "pending"}</span>
-        <span className="stat-divider" />
-        <span>Summary {formData.description ? "ready" : "not started"}</span>
+        {isRecruiter ? (
+          <>
+            <span>{formData.companyName || "Organization not added"}</span>
+            <span className="stat-divider" />
+            <span>{formData.jobTitle || "Hiring role not added"}</span>
+            <span className="stat-divider" />
+            <span>Hiring focus {formData.hiringFocus ? "added" : "pending"}</span>
+          </>
+        ) : (
+          <>
+            <span>{skillList.length} skill{skillList.length === 1 ? "" : "s"}</span>
+            <span className="stat-divider" />
+            <span>Education {formData.education ? "added" : "pending"}</span>
+            <span className="stat-divider" />
+            <span>Summary {formData.description ? "ready" : "not started"}</span>
+          </>
+        )}
       </div>
 
       {isEditing ? (
@@ -339,22 +362,71 @@ const ProfileSection = ({ user, setUser }) => {
               />
             </div>
 
-            <div className="profile-field">
-              <label className="profile-label" htmlFor="education">
-                Education
-              </label>
-              <input
-                id="education"
-                name="education"
-                type="text"
-                value={formData.education}
-                onChange={handleChange}
-                className="profile-input"
-                placeholder="Degree, institution, year"
-              />
-            </div>
+            {isRecruiter ? (
+              <>
+                <div className="profile-field">
+                  <label className="profile-label" htmlFor="companyName">
+                    Organization
+                  </label>
+                  <input
+                    id="companyName"
+                    name="companyName"
+                    type="text"
+                    value={formData.companyName}
+                    onChange={handleChange}
+                    className="profile-input"
+                    placeholder="Company or organization"
+                  />
+                </div>
+                <div className="profile-field">
+                  <label className="profile-label" htmlFor="jobTitle">
+                    Hiring role
+                  </label>
+                  <input
+                    id="jobTitle"
+                    name="jobTitle"
+                    type="text"
+                    value={formData.jobTitle}
+                    onChange={handleChange}
+                    className="profile-input"
+                    placeholder="e.g. Talent Acquisition Lead"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="profile-field">
+                <label className="profile-label" htmlFor="education">
+                  Education
+                </label>
+                <input
+                  id="education"
+                  name="education"
+                  type="text"
+                  value={formData.education}
+                  onChange={handleChange}
+                  className="profile-input"
+                  placeholder="Degree, institution, year"
+                />
+              </div>
+            )}
           </div>
 
+          {isRecruiter ? (
+            <div className="profile-field">
+              <label className="profile-label" htmlFor="hiringFocus">
+                Hiring focus
+              </label>
+              <input
+                id="hiringFocus"
+                name="hiringFocus"
+                type="text"
+                value={formData.hiringFocus}
+                onChange={handleChange}
+                className="profile-input"
+                placeholder="Teams, roles, or skills you hire for"
+              />
+            </div>
+          ) : (
           <div className="profile-field">
             <label className="profile-label" htmlFor="skillInput">
               Skills
@@ -388,8 +460,9 @@ const ProfileSection = ({ user, setUser }) => {
             </div>
             <p className="field-hint">Press Enter or comma to add a skill.</p>
           </div>
+          )}
 
-          <div className="resume-upload-panel">
+          {!isRecruiter && <div className="resume-upload-panel">
             <div className="resume-upload-header">
               <div>
                 <label className="profile-label">Resume</label>
@@ -438,11 +511,11 @@ const ProfileSection = ({ user, setUser }) => {
                 {resumeFile ? "Change resume" : "Upload resume"}
               </label>
             </div>
-          </div>
+          </div>}
 
           <div className="profile-field profile-summary-field">
             <label className="profile-label" htmlFor="description">
-              Professional summary
+              {isRecruiter ? "About your hiring team" : "Professional summary"}
             </label>
             <textarea
               id="description"
@@ -450,7 +523,9 @@ const ProfileSection = ({ user, setUser }) => {
               value={formData.description}
               onChange={handleChange}
               className="profile-textarea"
-              placeholder="Write a short professional summary"
+              placeholder={isRecruiter
+                ? "Describe your team, hiring approach, or the people you are looking to meet"
+                : "Write a short professional summary"}
               rows="5"
             />
           </div>
@@ -458,13 +533,31 @@ const ProfileSection = ({ user, setUser }) => {
       ) : (
         <div className="profile-content">
           <section className="profile-section-block">
-            <h3>Summary</h3>
+            <h3>{isRecruiter ? "Hiring team" : "Summary"}</h3>
             <p>
               {formData.description ||
-                "Add a short professional summary to highlight your experience and strengths."}
+                (isRecruiter
+                  ? "Add a short introduction to help candidates understand your team and hiring approach."
+                  : "Add a short professional summary to highlight your experience and strengths.")}
             </p>
           </section>
 
+          {isRecruiter ? (
+            <div className="profile-split recruiter-profile-details">
+              <section className="profile-section-block">
+                <h3>Organization</h3>
+                <p>{formData.companyName || "Add your company or organization."}</p>
+              </section>
+              <section className="profile-section-block">
+                <h3>Hiring role</h3>
+                <p>{formData.jobTitle || "Add your role on the hiring team."}</p>
+              </section>
+              <section className="profile-section-block recruiter-focus-block">
+                <h3>Hiring focus</h3>
+                <p>{formData.hiringFocus || "Add the teams, roles, or skills you hire for."}</p>
+              </section>
+            </div>
+          ) : (
           <div className="profile-split">
             <section className="profile-section-block">
               <h3>Education</h3>
@@ -486,8 +579,9 @@ const ProfileSection = ({ user, setUser }) => {
               </div>
             </section>
           </div>
+          )}
 
-          <section className="profile-section-block">
+          {!isRecruiter && <section className="profile-section-block">
             <h3>Resume</h3>
             {existingResumeUrl ? (
               <div className="resume-readonly-row">
@@ -499,7 +593,14 @@ const ProfileSection = ({ user, setUser }) => {
             ) : (
               <p>No resume uploaded yet.</p>
             )}
-          </section>
+          </section>}
+
+          {isRecruiter && (
+            <section className="recruiter-profile-actions" aria-label="Hiring tools">
+              <a href="/job">Post a role</a>
+              <a href="/connection">Explore the talent pool</a>
+            </section>
+          )}
         </div>
       )}
 

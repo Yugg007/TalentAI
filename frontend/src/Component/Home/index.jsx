@@ -15,6 +15,7 @@ import './style.css';
 import { BackendService } from '../../Utils/Api\'s/ApiMiddleWare';
 import ApiEndpoints from '../../Utils/Api\'s/ApiEndpoints';
 import { useAuth } from '../../context/AuthContext';
+import { getApplications } from '../../Utils/ApplicationsStore';
 
 const candidateActions = [
   {
@@ -70,6 +71,26 @@ const recruiterActions = [
   },
 ];
 
+const candidateJourney = [
+  { label: 'Discover', to: '/job' },
+  { label: 'Match', to: '/ats-score' },
+  { label: 'Apply', to: '/job' },
+  { label: 'Communicate', to: '/connection' },
+  { label: 'Prepare', to: '/mock-interview' },
+  { label: 'Interview', to: '/mock-interview' },
+  { label: 'Track', to: '/applications' },
+];
+
+const recruiterJourney = [
+  { label: 'Post', to: '/job' },
+  { label: 'Search', to: '/connection' },
+  { label: 'AI match', planned: true },
+  { label: 'Shortlist', planned: true },
+  { label: 'Communicate', to: '/chat' },
+  { label: 'Interview', to: '/mock-interview' },
+  { label: 'Hire', planned: true },
+];
+
 const Home = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -77,6 +98,8 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const isRecruiter = user?.role === 'recruiter';
+  const trackedCount = getApplications(user?.username || user?.userId)
+    .filter((application) => application.stage !== 'closed').length;
 
   const fetchAllJobs = async () => {
     setIsLoading(true);
@@ -170,6 +193,38 @@ const Home = () => {
         <p className="search-count">
           {isLoading ? 'Looking across open roles…' : `${filteredJobs.length} ${filteredJobs.length === 1 ? 'role' : 'roles'} to explore`}
         </p>
+      </section>
+
+      <section className="journey-section" aria-labelledby="journey-title">
+        <div className="journey-heading">
+          <div>
+            <p className="section-overline">ONE CONNECTED WORKFLOW</p>
+            <h2 id="journey-title">{isRecruiter ? 'From open role to great hire.' : 'From first search to interview day.'}</h2>
+          </div>
+          {!isRecruiter && (
+            <Link to="/applications" className="journey-count">
+              <span>{trackedCount}</span> tracked {trackedCount === 1 ? 'role' : 'roles'} <ArrowRight size={14} aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+        <div className="journey-rail">
+          {(isRecruiter ? recruiterJourney : candidateJourney).map((stage, index) => (
+            stage.planned ? (
+              <div className="journey-step is-planned" key={stage.label} aria-disabled="true">
+                <span className="journey-index">{String(index + 1).padStart(2, '0')}</span>
+                <span className="journey-stage">{stage.label}</span>
+                <span className="journey-planned-label">Planned</span>
+              </div>
+            ) : (
+              <Link className="journey-step" key={stage.label} to={stage.to}>
+                <span className="journey-index">{String(index + 1).padStart(2, '0')}</span>
+                <span className="journey-stage">{stage.label}</span>
+                <ArrowUpRight size={13} aria-hidden="true" />
+              </Link>
+            )
+          ))}
+        </div>
+        {isRecruiter && <p className="journey-note">AI matching, shortlisting, and hire tracking will connect here as those workflows are built.</p>}
       </section>
 
       <section className="action-section" aria-labelledby="action-title">

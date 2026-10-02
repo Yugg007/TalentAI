@@ -1,29 +1,39 @@
 
+_format_version: "3.0"
+
 services:
-  # 1. Spring Boot: Business Logic & Auth
   - name: spring-core-backend
-    url: http://host.docker.internal:7006
+    url: http://host.docker.internal:7003
     routes:
       - name: spring-core-backend-route
         paths:
           - /api/v1/core
         strip_path: false
 
-  # 2. Node.js: Real-time Communication
   - name: node-communication-service
     url: http://host.docker.internal:7007
     routes:
-      - name: node-communicationroute
+      - name: node-communication-route
         paths:
           - /api/v1/comm
           - /socket.io
         strip_path: false
 
-# Global Security & Interactivity
 plugins:
   - name: cors
     config:
-      origins: ["http://localhost:7000"]  # Allow your React app
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-      headers: ["Accept", "Content-Length", "Content-Type", "Accept-Encoding", "Authorization"]
+      origins:
+        - http://localhost:7001
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Content-Length
+        - Content-Type
+        - Accept-Encoding
+        - Authorization
       credentials: true

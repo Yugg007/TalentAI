@@ -14,10 +14,15 @@ import ChatRoom from './Component/ChatRoom'
 import './App.css';
 import News from './Component/News'
 import ChatBot from './Component/Chatbot'
+import Applications from './Component/Applications'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
 const ProtectedRoute = ({ children }) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isAuthLoading } = useAuth();
+
+  if (isAuthLoading) {
+    return <div className="route-loading" role="status">Checking your session…</div>;
+  }
 
   if (!isLoggedIn) {
     return <Navigate to="/profile" replace />;
@@ -37,6 +42,7 @@ const App = () => {
             <Route path="/profile/:uname" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><ChatRoom /></ProtectedRoute>} />
             <Route path="/ats-score" element={<ProtectedRoute><ATSScore /></ProtectedRoute>} />
+            <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
             <Route path="/connection" element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
             <Route path="/mock-interview" element={<ProtectedRoute><MockInterview /></ProtectedRoute>} />
             <Route path="/mock-interview/:id" element={<ProtectedRoute><MockInterview /></ProtectedRoute>} />

@@ -1,5 +1,5 @@
 const gatewayBaseUrl = (
-    import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:7001"
+    import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:7002"
 ).replace(/\/+$/, "");
 
 const Property = {

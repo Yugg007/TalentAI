@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import "./style.css";
 import Schedule from "./Schedule";
 import Loader from "../Utility/Loader"
@@ -8,6 +9,8 @@ import Property from "../../Utils/Property";
 
 const MockInterview = () => {
   const [loader, setLoader] = useState(false);
+  const { state } = useLocation();
+  const linkedRole = state?.role;
 
   const checkGoogleToken = async () => {
     try {
@@ -49,7 +52,15 @@ const MockInterview = () => {
     <div>
       {loader && <Loader />}
 
-      <h2 className="mock-title">Mock Interview Scheduler</h2>
+      <div className="interview-page-heading">
+        <p className="section-overline">PREPARE / INTERVIEW</p>
+        <h1 className="mock-title">Interview prep & scheduling</h1>
+        <p className="interview-context">
+          {linkedRole
+            ? `Next up: ${linkedRole.title} at ${linkedRole.company}. Schedule a conversation for this role.`
+            : "Keep interview scheduling and preparation connected to your job search."}
+        </p>
+      </div>
 
       <Schedule handleGoogleAuth= {handleGoogleAuth} checkGoogleToken = {checkGoogleToken}/>
 

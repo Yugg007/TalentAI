@@ -8,11 +8,13 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   const authStatus = async () => {
+    setIsAuthLoading(true);
     try {
       const response = await BackendService(ApiEndpoints.authStatus, {});
-      if (response?.data) {
+      if (response?.data?.username) {
         setUser(response.data);
         setIsLoggedIn(true);
       } else {
@@ -22,7 +24,11 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       setUser(null);
       setIsLoggedIn(false);
-      console.error('Auth status error:', error);
+      if (![400, 401].includes(error.response?.status)) {
+        console.error('Auth status error:', error);
+      }
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -47,6 +53,7 @@ const AuthProvider = ({ children }) => {
       value={{
         user,
         isLoggedIn,
+        isAuthLoading,
         setUser,
         setIsLoggedIn,
         authStatus,

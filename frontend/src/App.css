@@ -159,6 +159,25 @@ body {
   line-height: 1.5;
 }
 
+.auth-loading {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.auth-error {
+  margin: 0;
+  padding: 10px 11px;
+  border: 1px solid #e8c7bd;
+  border-radius: 5px;
+  background: #fbefeb;
+  color: #8a3e31;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .auth-form {
   display: grid;
   gap: 12px;
@@ -233,6 +252,11 @@ body {
   font-size: 12px;
 }
 
+.auth-card .btn-primary:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .toggle-text {
   margin: 18px 0 0;
   color: var(--muted);
@@ -254,6 +278,62 @@ body {
   color: var(--muted);
   font-size: 20px;
   font-weight: 700;
+}
+
+.ats-intro {
+  max-width: 620px;
+  margin: -18px 0 27px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.job-company-mark {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #e3eedc;
+  color: var(--forest);
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.tracker-follow-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--forest);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tracker-follow-link:hover {
+  color: var(--coral);
+}
+
+.interview-page-heading {
+  margin-bottom: 22px;
+}
+
+.interview-page-heading .section-overline {
+  margin-bottom: 6px;
+}
+
+.interview-page-heading .mock-title {
+  margin: 0;
+}
+
+.interview-context {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 :is(.auth-card, .ats-card, .job-create-container, .profile-container, .job-card-panel, .job-sidebar-panel, .mock-form, .connection-card, .pending-card, .people-card, .articles-container .card, .profile-card, .profile-field) {

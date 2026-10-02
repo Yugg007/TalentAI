@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CookieUtil {
 	
     public String extractTokenFromCookies(HttpServletRequest request) {
-    	System.out.println(request.getCookies());
         if (request.getCookies() == null) return null;
 
         for (Cookie cookie : request.getCookies()) {

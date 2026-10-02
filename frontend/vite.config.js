@@ -7,7 +7,8 @@ import rollupNodePolyFill from 'rollup-plugin-node-polyfills';
 export default defineConfig({
   plugins: [react()],
     server: {
-    port: 7000,      // <-- Change to your desired port
+    port: 7001,
+    strictPort: true,
     host: true       // <-- Optional: allows access from Docker or other devices
   },
   define: {

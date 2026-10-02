@@ -1,6 +1,7 @@
 import { createElement, useState } from "react";
 import {
   ArrowUpRight,
+  ClipboardList,
   BriefcaseBusiness,
   CalendarDays,
   ChevronDown,
@@ -33,6 +34,8 @@ const Navbar = () => {
             { to: "/", label: "Overview", icon: House, end: true },
             { to: "/job", label: "Post a role", icon: BriefcaseBusiness },
             { to: "/connection", label: "Talent pool", icon: UsersRound },
+            { to: "/chat", label: "Messages", icon: MessageCircle },
+            { to: "/mock-interview", label: "Interviews", icon: CalendarDays },
           ],
         },
         {
@@ -50,6 +53,7 @@ const Navbar = () => {
             { to: "/", label: "Overview", icon: House, end: true },
             { to: "/job", label: "Find roles", icon: BriefcaseBusiness },
             { to: "/ats-score", label: "Resume fit", icon: FileText },
+            { to: "/applications", label: "Applications", icon: ClipboardList },
             { to: "/mock-interview", label: "Interview prep", icon: CalendarDays },
           ],
         },

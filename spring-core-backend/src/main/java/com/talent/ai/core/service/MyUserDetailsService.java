@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import java.util.Locale;
 
 import com.talent.ai.core.model.MasterData;
 import com.talent.ai.core.model.User;
@@ -22,10 +23,11 @@ public class MyUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
+        String role = user.getRole() == null ? "candidate" : user.getRole().toLowerCase(Locale.ROOT);
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles("USER")
+            .roles(role.toUpperCase(Locale.ROOT))
                 .build();
     }
 }

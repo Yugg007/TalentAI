@@ -11,9 +11,13 @@ public class UserDTO {
     private Long userId;
     private String username;
     private String email;
+    private String role;
 
     // From PersonInfo
     private String firstName;
+    private String companyName;
+    private String jobTitle;
+    private String hiringFocus;
     private String skills;
     private String education;
     private String description;
@@ -47,12 +51,44 @@ public class UserDTO {
         this.email = email;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getFirstName() {
         return firstName;
     }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public String getHiringFocus() {
+        return hiringFocus;
+    }
+
+    public void setHiringFocus(String hiringFocus) {
+        this.hiringFocus = hiringFocus;
     }
 
     public String getSkills() {
@@ -110,10 +146,14 @@ public class UserDTO {
             dto.setUserId(user.getUserId());
             dto.setUsername(user.getUsername());
             dto.setEmail(user.getEmail());
+            dto.setRole(user.getRole() == null ? "candidate" : user.getRole());
 
             PersonInfo info = user.getPersonInfos();
             if (info != null) {
                 dto.setFirstName(info.getFirstName());
+                dto.setCompanyName(info.getCompanyName());
+                dto.setJobTitle(info.getJobTitle());
+                dto.setHiringFocus(info.getHiringFocus());
                 dto.setSkills(info.getSkills());
                 dto.setEducation(info.getEducation());
                 dto.setDescription(info.getDescription());
