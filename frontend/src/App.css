@@ -593,66 +593,6 @@ body {
   border-radius: 6px;
 }
 
-.chatroom-container {
-  height: min(760px, calc(100vh - 155px));
-  min-height: 480px;
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--paper);
-  font-family: inherit;
-}
-
-.chatroom-container .sidebar {
-  width: 280px;
-  flex: 0 0 280px;
-  border-right-color: var(--line);
-  background: #f8f9f6;
-}
-
-.chatroom-container .sidebar-title {
-  color: var(--ink);
-  font-family: 'Manrope', sans-serif;
-  font-size: 17px;
-  text-align: left;
-}
-
-.chatroom-container .chat-area {
-  min-width: 0;
-}
-
-.chatroom-container .chat-header {
-  min-height: 58px;
-  background: var(--forest);
-  font-size: 14px;
-}
-
-.chatroom-container .chat-messages {
-  background: #f6f8f4;
-}
-
-.chatroom-container .message {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  font-size: 12px;
-}
-
-.chatroom-container .message.sent {
-  border-color: #d4e4c8;
-  background: #e8f1df;
-}
-
-.chatroom-container .chat-input-container {
-  gap: 9px;
-  border-top-color: var(--line);
-}
-
-.chatroom-container .chat-input-container input {
-  min-width: 0;
-  border-radius: 6px;
-}
-
 .profile-card {
   max-width: 920px;
   background: var(--paper);
@@ -711,17 +651,6 @@ body {
 
   .job-title {
     font-size: 25px;
-  }
-
-  .chatroom-container {
-    height: calc(100dvh - 190px);
-    min-height: 420px;
-  }
-
-  .chatroom-container .sidebar {
-    width: 118px;
-    flex-basis: 118px;
-    padding: 12px 8px;
   }
 
   .chatbot-container {
