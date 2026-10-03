@@ -57,6 +57,10 @@ class LLMService:
             timeout=self.timeout
         )
 
+        print(
+            f"Response status code: {response}"
+        )
+
         response.raise_for_status()
 
         data = response.json()

@@ -15,7 +15,7 @@ class TaskRepository:
         return ObjectId(task_id) if isinstance(task_id, str) else task_id
 
     def find_by_statuses(self, statuses: list) -> list:
-        logger.info(f"Fetching tasks matching statuses: {statuses}")
+        # logger.info(f"Fetching tasks matching statuses: {statuses}")
         return list(self.collection.find({"status": {"$in": statuses}}))
 
     def update_fields(self, task_id: str, fields_to_set: dict) -> bool:

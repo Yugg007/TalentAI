@@ -1,9 +1,8 @@
-
 _format_version: "3.0"
 
 services:
   - name: spring-core-backend
-    url: http://host.docker.internal:7003
+    url: http://host.docker.internal:7005
     routes:
       - name: spring-core-backend-route
         paths:
@@ -11,7 +10,7 @@ services:
         strip_path: false
 
   - name: node-communication-service
-    url: http://host.docker.internal:7007
+    url: http://host.docker.internal:7006
     routes:
       - name: node-communication-route
         paths:

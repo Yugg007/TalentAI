@@ -34,7 +34,9 @@ class AIPipeline:
 
     def execute(self, task):
         context = PipelineContext(task=task)
-        existing_results = task.get("result", {})
+        existing_results = task.get("result")
+        if not isinstance(existing_results, dict):
+            existing_results = {}
 
         print("Starting pipeline execution for task:", task["_id"])
         print("Existing results found:", existing_results.keys())
@@ -48,14 +50,14 @@ class AIPipeline:
             jd_future = None
 
             # Skip or Execute Resume Stage
-            if "resume_profile" in existing_results:
+            if existing_results.get("resume_profile") is not None:
                 print("Skipping ResumeStage: Loaded cached data.")
                 context.resume_profile = existing_results["resume_profile"]
             else:
                 resume_future = executor.submit(self.resume_stage.execute, context)
 
             # Skip or Execute JD Stage
-            if "jd_profile" in existing_results:
+            if existing_results.get("jd_profile") is not None:
                 print("Skipping JDStage: Loaded cached data.")
                 context.jd_profile = existing_results["jd_profile"]
             else:
@@ -75,7 +77,7 @@ class AIPipeline:
         # ----------------------------------------------------------
         # Sequential Stage: ATS Score
         # ----------------------------------------------------------
-        if "ats_result" in existing_results:
+        if existing_results.get("ats_result") is not None:
             print("Skipping AtsScoreStage: Loaded cached data.")
             context.ats_result = existing_results["ats_result"]
         else:
@@ -85,7 +87,7 @@ class AIPipeline:
         # ----------------------------------------------------------
         # Sequential Stage: Interview Prep
         # ----------------------------------------------------------
-        if "interview_preparation" in existing_results:
+        if existing_results.get("interview_preparation") is not None:
             print("Skipping InterviewStage: Loaded cached data.")
             context.interview_preparation = existing_results["interview_preparation"]
         else:

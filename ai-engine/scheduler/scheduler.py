@@ -33,6 +33,10 @@ class Scheduler:
                     task_state_manager.get_pending_and_failed_tasks()
                 )
 
+                print(
+                    f"Found {len(tasks)} pending tasks"
+                )
+
                 if tasks:
 
                     logger.info(

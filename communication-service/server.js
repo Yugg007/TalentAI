@@ -14,8 +14,9 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const PORT = Number(process.env.PORT) || 7007;
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:7000').split(',').map(origin => origin.trim());
+const PORT = Number(process.env.PORT) || 7006;
+const defaultOrigins = ['http://localhost:7001', 'http://localhost:7002'];
+const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(',')).split(',').map(origin => origin.trim()).filter(Boolean);
 
 const io = new Server(server, {
   cors: {
